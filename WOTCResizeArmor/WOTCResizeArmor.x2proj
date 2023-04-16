@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Guid>67dd7591-2c1e-4d18-a981-3870b50d6172</Guid>
+    <Name>WOTCResizeArmor</Name>
+    <Description>Allows to resize individual body parts for each soldier.</Description>
+    <SteamPublishID>0</SteamPublishID>
+    <AssemblyName>WOTCResizeArmor</AssemblyName>
+    <RootNamespace>WOTCResizeArmor</RootNamespace>
+    <ProjectGuid>{e6ae9183-1c1d-4ed8-bb83-5e5d39c9b8c8}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="Config\Base\" />
+    <Folder Include="Localization\" />
+    <Folder Include="Src\" />
+    <Folder Include="Content\" />
+    <Folder Include="ContentForCook\" />
+    <Folder Include="Src\WOTCResizeArmor\" />
+    <Folder Include="Src\WOTCResizeArmor\Classes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config\XComUI.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ReadMe.txt" />
+    <Content Include="ModPreview.jpg" />
+    <Content Include="ContentOptions.json" />
+    <Content Include="Config\Base\XComEditor.ini" />
+    <Content Include="Config\Base\XComEngine.ini" />
+    <Content Include="Config\Base\XComGame.ini" />
+    <Content Include="Config\XComTemplateCreator.ini" />
+    <Content Include="Config\XComTemplateEditor.ini" />
+    <Content Include="Localization\XComGame.int" />
+    <Content Include="Localization\WOTCResizeArmor.int" />
+    <Content Include="Src\extra_globals.uci" />
+    <Content Include="Src\WOTCResizeArmor\Classes\UIPanel_ResizeArmor.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\WOTCResizeArmor\Classes\UISL_ResizeArmor.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\WOTCResizeArmor\Classes\X2DLCInfo_WOTCResizeArmor.uc" />
+    <Content Include="Src\WOTCResizeArmor\Classes\Help.uc" />
+    <Content Include="Src\WOTCResizeArmor\Classes\ConfigEngine.uc" />
+  </ItemGroup>
+  <PropertyGroup>
+    <SolutionRoot>$(MSBuildProjectDirectory)\..\</SolutionRoot>
+    <ScriptsDir>$(SolutionRoot).scripts\\</ScriptsDir>
+    <BuildCommonRoot>$(ScriptsDir)X2ModBuildCommon\</BuildCommonRoot>
+  </PropertyGroup>
+  <Import Project="$(BuildCommonRoot)XCOM2.targets" />
+</Project>
