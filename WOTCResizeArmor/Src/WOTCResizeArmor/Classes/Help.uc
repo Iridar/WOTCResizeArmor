@@ -3,6 +3,17 @@
 //  PURPOSE: Helper class for static functions and script snippet repository.     
 //---------------------------------------------------------------------------------------
 
+/*
+TODO: 
+1. When resizing legs, do not add translation to legs, add translation to every other part instead.
+2. Add translation sliders.
+3. Allow resizing entire pawn.
+4. Allow resizing head and head props
+4. When resizing arms, resize weapons as well.
+5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
+
+*/
+
 class Help extends Object abstract;
 
 struct ArmorSizeStruct
@@ -11,6 +22,12 @@ struct ArmorSizeStruct
 	var name	PartName;
 	var EUICustomizeCategory Category;
 	var float	PartSize;
+	var vector	Translation;
+
+	structdefaultproperties
+	{
+		PartSize = 1.0f
+	}
 };
 
 static final function SetPartSize(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, const float PartSize)
@@ -74,22 +91,21 @@ static final function bool GetPartSize(XComGameState_Unit UnitState, const name 
 	return false;
 }
 
+
 static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
-	ResizeComponent(UnitState, UnitState.kAppearance.nmTorso, eUICustomizeCat_Torso, Pawn.m_kTorsoComponent);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmArms, eUICustomizeCat_Arms, Pawn.m_kArmsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLegs, eUICustomizeCat_Legs, Pawn.m_kLegsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArm, eUICustomizeCat_LeftArm, Pawn.m_kLeftArm);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArm, eUICustomizeCat_RightArm, Pawn.m_kRightArm);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArmDeco, eUICustomizeCat_LeftArmDeco, Pawn.m_kLeftArmDeco);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArmDeco, eUICustomizeCat_RightArmDeco, Pawn.m_kRightArmDeco);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftForearm, eUICustomizeCat_LeftForearm, Pawn.m_kLeftForearmMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmRightForearm, eUICustomizeCat_RightForearm, Pawn.m_kRightForearmMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmThighs, eUICustomizeCat_Thighs, Pawn.m_kThighsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmShins, eUICustomizeCat_Shins, Pawn.m_kShinsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmTorsoDeco, eUICustomizeCat_TorsoDeco, Pawn.m_kTorsoDecoMC);
-
-	//Pawn.DLCAppendSockets();
+	ResizeComponent(UnitState, UnitState.kAppearance.nmTorso,			eUICustomizeCat_Torso,			Pawn.m_kTorsoComponent);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmArms,			eUICustomizeCat_Arms,			Pawn.m_kArmsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLegs,			eUICustomizeCat_Legs,			Pawn.m_kLegsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArm,			eUICustomizeCat_LeftArm,		Pawn.m_kLeftArm);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArm,		eUICustomizeCat_RightArm,		Pawn.m_kRightArm);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArmDeco,		eUICustomizeCat_LeftArmDeco,	Pawn.m_kLeftArmDeco);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArmDeco,	eUICustomizeCat_RightArmDeco,	Pawn.m_kRightArmDeco);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftForearm,		eUICustomizeCat_LeftForearm,	Pawn.m_kLeftForearmMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmRightForearm,	eUICustomizeCat_RightForearm,	Pawn.m_kRightForearmMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmThighs,			eUICustomizeCat_Thighs,			Pawn.m_kThighsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmShins,			eUICustomizeCat_Shins,			Pawn.m_kShinsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmTorsoDeco,		eUICustomizeCat_TorsoDeco,		Pawn.m_kTorsoDecoMC);
 }
 
 static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp)
@@ -115,6 +131,30 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	//	
 	//}
 }
+
+
+
+static final function bool FindArmorSize(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, out ArmorSizeStruct _ArmorSize)
+{
+	local XComGameState_ResizeArmor StateObject;
+	local ArmorSizeStruct ArmorSize;
+
+	StateObject = class'XComGameState_ResizeArmor'.static.Get();
+	if (StateObject == none)
+		return false;
+
+	foreach StateObject.ArmorSizes(ArmorSize)
+	{
+		if (ArmorSize.UnitID == UnitState.ObjectID &&
+			ArmorSize.PartName == PartName &&
+			ArmorSize.Category == Category)
+		{
+			_ArmorSize = ArmorSize;
+			return true;
+		}
+	}
+	return false;
+} 
 
 /*
 static final function SetPartPosition(XComGameState_Unit UnitState, const name PartName, const float FloatValue)

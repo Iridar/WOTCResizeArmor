@@ -174,6 +174,8 @@ private function AcquirePawnAndResize()
 }
 
 
+
+
 private function EUICustomizeCategory GetCustomizeCategory()
 {
 	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeTorso))

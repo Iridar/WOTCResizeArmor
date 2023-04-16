@@ -1,10 +1,10 @@
 class X2DLCInfo_WOTCResizeArmor extends X2DownloadableContentInfo;
 
-//exec function SetOffset(int X, int Y)
-//{	
-//	class'UIPanel_ResizeArmor'.default.DefaultOffsetX = X;
-//	class'UIPanel_ResizeArmor'.default.DefaultOffsetY = Y;
-//}
+exec function SetOffset(int X, int Y)
+{	
+	class'UIPanel_ResizeArmor'.default.DefaultOffsetX = X;
+	class'UIPanel_ResizeArmor'.default.DefaultOffsetY = Y;
+}
 
 static function string DLCAppendSockets(XComUnitPawn Pawn)
 {
