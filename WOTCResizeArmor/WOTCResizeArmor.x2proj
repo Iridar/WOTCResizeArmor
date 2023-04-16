@@ -14,8 +14,6 @@
     <Folder Include="Config\Base\" />
     <Folder Include="Localization\" />
     <Folder Include="Src\" />
-    <Folder Include="Content\" />
-    <Folder Include="ContentForCook\" />
     <Folder Include="Src\WOTCResizeArmor\" />
     <Folder Include="Src\WOTCResizeArmor\Classes\" />
   </ItemGroup>
@@ -29,9 +27,6 @@
     <Content Include="Config\Base\XComEditor.ini" />
     <Content Include="Config\Base\XComEngine.ini" />
     <Content Include="Config\Base\XComGame.ini" />
-    <Content Include="Config\XComTemplateCreator.ini" />
-    <Content Include="Config\XComTemplateEditor.ini" />
-    <Content Include="Localization\XComGame.int" />
     <Content Include="Localization\WOTCResizeArmor.int" />
     <Content Include="Src\extra_globals.uci" />
     <Content Include="Src\WOTCResizeArmor\Classes\UIPanel_ResizeArmor.uc">
@@ -42,7 +37,9 @@
     </Content>
     <Content Include="Src\WOTCResizeArmor\Classes\X2DLCInfo_WOTCResizeArmor.uc" />
     <Content Include="Src\WOTCResizeArmor\Classes\Help.uc" />
-    <Content Include="Src\WOTCResizeArmor\Classes\ConfigEngine.uc" />
+    <Content Include="Src\WOTCResizeArmor\Classes\XComGameState_ResizeArmor.uc">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <SolutionRoot>$(MSBuildProjectDirectory)\..\</SolutionRoot>

@@ -5,65 +5,99 @@
 
 class Help extends Object abstract;
 
-var string SizeSuffix;
-var string PositionSuffix;
-
-static final function SetPartSize(XComGameState_Unit UnitState, const name PartName, const float FloatValue)
+struct ArmorSizeStruct
 {
-	local XComGameState			NewGameState;
-	local XComGameState_Unit	NewUnitState;
-	local name					ValueName;
+	var int		UnitID;
+	var name	PartName;
+	var EUICustomizeCategory Category;
+	var float	PartSize;
+};
 
-	ValueName = name(PartName @ default.SizeSuffix); 
+static final function SetPartSize(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, const float PartSize)
+{
+	local XComGameState				NewGameState;
+	local XComGameState_ResizeArmor StateObject;
+	local ArmorSizeStruct			ArmorSize;
+	local int i;
 
-	`AMLOG("Setting scale:" @ FloatValue @ PartName);
+	`AMLOG("Setting scale:" @ PartSize @ PartName);
 
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Set Part Size:" @ PartName @ FloatValue);
-	NewUnitState = XComGameState_Unit(NewGameState.ModifyStateObject(UnitState.Class, UnitState.ObjectID));
-	NewUnitState.SetUnitFloatValue(ValueName, FloatValue, eCleanup_Never);
-	`GAMERULES.SubmitGameState(NewGameState);
-}
-static final function bool GetPartSize(XComGameState_Unit UnitState, const name PartName, out float PartSize)
-{	
-	local UnitValue UV;
-	local name ValueName;
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Set Part Size:" @ PartName @ PartSize);
+	StateObject = class'XComGameState_ResizeArmor'.static.GetOrCreateAndPrep(NewGameState);
 
-	ValueName = name(PartName @ default.SizeSuffix); 
-
-	if (UnitState.GetUnitValue(ValueName, UV))
+	for (i = 0; i < StateObject.ArmorSizes.Length; i++)
 	{
-		PartSize = UV.fValue;
-		return true;
+		if (StateObject.ArmorSizes[i].UnitID == UnitState.ObjectID &&
+			StateObject.ArmorSizes[i].PartName == PartName &&
+			StateObject.ArmorSizes[i].Category == Category)
+		{
+			StateObject.ArmorSizes[i].PartSize = PartSize;
+			`GAMERULES.SubmitGameState(NewGameState);
+			return;
+		}
 	}
 
+	ArmorSize.UnitID = UnitState.ObjectID;
+	ArmorSize.PartName = PartName;
+	ArmorSize.Category = Category;
+	ArmorSize.PartSize = PartSize;
+
+	StateObject.ArmorSizes.AddItem(ArmorSize);
+
+	`GAMERULES.SubmitGameState(NewGameState);
+}
+
+static final function bool GetPartSize(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, out float PartSize)
+{	
+	local XComGameState_ResizeArmor StateObject;
+	local ArmorSizeStruct ArmorSize;
+
+	StateObject = class'XComGameState_ResizeArmor'.static.Get();
+	if (StateObject == none)
+	{
+		PartSize = 1.0f;
+		return false;
+	}
+
+	foreach StateObject.ArmorSizes(ArmorSize)
+	{
+		if (ArmorSize.UnitID == UnitState.ObjectID &&
+			ArmorSize.PartName == PartName &&
+			ArmorSize.Category == Category)
+		{
+			PartSize = ArmorSize.PartSize;
+			return true;
+		}
+	}
+	
 	PartSize = 1.0f;
 	return false;
 }
 
 static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
-	ResizeComponent(UnitState, UnitState.kAppearance.nmTorso, Pawn.m_kTorsoComponent);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmArms, Pawn.m_kArmsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLegs, Pawn.m_kLegsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArm, Pawn.m_kLeftArm);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArm, Pawn.m_kRightArm);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArmDeco, Pawn.m_kLeftArmDeco);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArmDeco, Pawn.m_kRightArmDeco);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftForearm, Pawn.m_kLeftForearmMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmRightForearm, Pawn.m_kRightForearmMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmThighs, Pawn.m_kThighsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmShins, Pawn.m_kShinsMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmTorsoDeco, Pawn.m_kTorsoDecoMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmTorso, eUICustomizeCat_Torso, Pawn.m_kTorsoComponent);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmArms, eUICustomizeCat_Arms, Pawn.m_kArmsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLegs, eUICustomizeCat_Legs, Pawn.m_kLegsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArm, eUICustomizeCat_LeftArm, Pawn.m_kLeftArm);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArm, eUICustomizeCat_RightArm, Pawn.m_kRightArm);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftArmDeco, eUICustomizeCat_LeftArmDeco, Pawn.m_kLeftArmDeco);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmRightArmDeco, eUICustomizeCat_RightArmDeco, Pawn.m_kRightArmDeco);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmLeftForearm, eUICustomizeCat_LeftForearm, Pawn.m_kLeftForearmMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmRightForearm, eUICustomizeCat_RightForearm, Pawn.m_kRightForearmMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmThighs, eUICustomizeCat_Thighs, Pawn.m_kThighsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmShins, eUICustomizeCat_Shins, Pawn.m_kShinsMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmTorsoDeco, eUICustomizeCat_TorsoDeco, Pawn.m_kTorsoDecoMC);
 
 	//Pawn.DLCAppendSockets();
 }
 
-static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, SkeletalMeshComponent MeshComp)
+static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp)
 {
 	local float		PartScale;
 	local vector	Translation;
 
-	if (class'Help'.static.GetPartSize(UnitState, PartName, PartScale))
+	if (class'Help'.static.GetPartSize(UnitState, PartName, Category, PartScale))
 	{
 		MeshComp.SetScale(PartScale);
 
@@ -579,10 +613,4 @@ static final function bool IsItemUniqueEquipInSlot(X2ItemTemplateManager ItemMgr
 	WeaponTemplate = X2WeaponTemplate(ItemTemplate);
 
 	return ItemMgr.ItemCategoryIsUniqueEquip(ItemTemplate.ItemCat) || WeaponTemplate != none && ItemMgr.ItemCategoryIsUniqueEquip(WeaponTemplate.WeaponCat);
-}
-
-defaultproperties
-{	
-	SizeSuffix = "_Size"
-	PositionSuffix = "_Position"
 }

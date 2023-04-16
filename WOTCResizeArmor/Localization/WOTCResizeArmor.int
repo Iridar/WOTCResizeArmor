@@ -1,2 +1,2 @@
-[Help]
-SomeString = "localized_value"
+[UIPanel_ResizeArmor]
+strSize = "Size"

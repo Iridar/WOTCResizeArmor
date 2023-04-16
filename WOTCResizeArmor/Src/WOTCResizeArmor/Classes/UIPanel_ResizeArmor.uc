@@ -18,6 +18,10 @@ var config int DefaultOffsetY;
 var config float MinSize;
 var config float MaxSize;
 
+var config float TimeBetweenPawnUpdates;
+
+var private localized string strSize;
+
 //var config int	MaxPosition;
 //MaxPosition = 50
 
@@ -96,8 +100,8 @@ private function DelayedInit()
 	ListItem.bAnimateOnInit = false;
 	ListItem.InitListItem();
 	//ListItem.SetWidth(562);
-	class'Help'.static.GetPartSize(UnitState, GetPartName(), InitialScale);
-	ListItem.UpdateDataSlider("Size", string(int(InitialScale * 100)), (InitialScale - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
+	class'Help'.static.GetPartSize(UnitState, GetPartName(), CustomizeCategory, InitialScale);
+	ListItem.UpdateDataSlider(strSize, string(int(InitialScale * 100)), (InitialScale - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
 
 	//ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	//ListItem.bAnimateOnInit = false;
@@ -128,14 +132,11 @@ private function OnSizeSliderChanged(UISlider sliderControl)
 	if (PartName == '')
 		return;
 
-	class'Help'.static.SetPartSize(UnitState, PartName, Scale);
+	class'Help'.static.SetPartSize(UnitState, PartName, CustomizeCategory, Scale);
 
-	UnitState = CustomizeScreen.GetUnit();
-	CustomizeScreen.Unit = UnitState;
-	CustomizeBody.Unit = UnitState;
-	CustomizeScreen.CustomizeManager.Refresh(CustomizeScreen.CustomizeManager.UpdatedUnitState, UnitState);
+	//CustomizeScreen.CustomizeManager.Refresh(CustomizeScreen.CustomizeManager.UpdatedUnitState, UnitState);
 
-	UnitPawn.DLCAppendSockets();
+	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
 }
 
 private function OnBodyPartSelected(UIList ContainerList, int ItemIndex)
@@ -149,10 +150,27 @@ private function OnBodyPartSelected(UIList ContainerList, int ItemIndex)
 		return;
 
 	ListItem = UIMechaListItem(List.GetItem(0));
-	class'Help'.static.GetPartSize(UnitState, GetPartName(), InitialScale);
-	ListItem.UpdateDataSlider("Size", string(int(InitialScale * 100)), (InitialScale - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
+	class'Help'.static.GetPartSize(UnitState, GetPartName(), CustomizeCategory, InitialScale);
+	ListItem.UpdateDataSlider(strSize, string(int(InitialScale * 100)), (InitialScale - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
 
 	`AMLOG("Item Selected:" @ ItemIndex @ GetPartName() @ InitialScale);
+
+	//Hide();
+	self.SetTimer(TimeBetweenPawnUpdates, false, nameof(AcquirePawnAndResize), self);
+}
+
+private function AcquirePawnAndResize()
+{
+	UnitPawn = XComHumanPawn(CustomizeScreen.CustomizeManager.ActorPawn);
+	if (UnitPawn == none)
+	{
+		self.SetTimer(TimeBetweenPawnUpdates, false, nameof(AcquirePawnAndResize), self);
+	}
+	else
+	{
+		//Show();
+		class'Help'.static.ResizeArmor(UnitState, UnitPawn);
+	}
 }
 
 
