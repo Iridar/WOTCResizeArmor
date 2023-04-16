@@ -14,16 +14,14 @@ var private UIBGBox ListBG;
 
 var config int DefaultOffsetX;
 var config int DefaultOffsetY;
+var private config float TimeBetweenPawnUpdates;
 
-var config float MinSize;
-var config float MaxSize;
 
-var config float TimeBetweenPawnUpdates;
+var private config float MinSize;
+var private config float MaxSize;
+var private config int MaxTranslation;
 
 var private localized string strSize;
-
-//var config int	MaxPosition;
-//MaxPosition = 50
 
 delegate OnItemSelectedCallback(UIList _list, int itemIndex);
 
@@ -39,7 +37,9 @@ simulated function UIPanel InitPanel(optional name InitName, optional name InitL
 private function DelayedInit()
 {
 	local UIMechaListItem ListItem;
-	local float InitialScale;
+	local ArmorSizeStruct ArmorSize;
+	local float PartSize;
+	local vector Translation;
 
 	CustomizeBody = UICustomize_Body(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_Body'));
 	if (CustomizeBody == none)
@@ -82,7 +82,7 @@ private function DelayedInit()
 	ListBG.InitBG();
 	ListBG.SetAlpha(80);
 	ListBG.SetWidth(582);
-	ListBG.SetHeight(50);
+	ListBG.SetHeight(250);
 	
 	//ListBG.ProcessMouseEvents(List.OnChildMouseEvent);
 
@@ -94,21 +94,37 @@ private function DelayedInit()
 	List.SetPosition(0, 5);
 	List.InitList();
 	List.SetWidth(582);
-	List.SetHeight(40);
+	List.SetHeight(240);
 
+	class'Help'.static.FindArmorSize(UnitState, GetPartName(), CustomizeCategory, ArmorSize);
+	PartSize = ArmorSize.PartSize;
+	Translation = ArmorSize.Translation;
+
+	// Size
 	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	ListItem.bAnimateOnInit = false;
 	ListItem.InitListItem();
 	//ListItem.SetWidth(562);
-	class'Help'.static.GetPartSize(UnitState, GetPartName(), CustomizeCategory, InitialScale);
-	ListItem.UpdateDataSlider(strSize, string(int(InitialScale * 100)), (InitialScale - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
+	class'Help'.static.GetPartSize(UnitState, GetPartName(), CustomizeCategory, PartSize);
+	ListItem.UpdateDataSlider(strSize, string(int(PartSize * 100)), (PartSize - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
 
-	//ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
-	//ListItem.bAnimateOnInit = false;
-	//ListItem.InitListItem();
-	////ListItem.SetWidth(562);
-	//class'Help'.static.GetPartPosition(UnitState, GetPartName(), InitialPosition);
-	//ListItem.UpdateDataSlider("Position", string(InitialPosition.Z), InitialPosition.Z,, OnPositionSliderChanged);
+	// X
+	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
+	ListItem.bAnimateOnInit = false;
+	ListItem.InitListItem();
+	ListItem.UpdateDataSlider("X", string(int(Translation.X)), Translation.X / MaxTranslation,, OnTranslationSliderChanged_X);
+
+	// Y
+	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
+	ListItem.bAnimateOnInit = false;
+	ListItem.InitListItem();
+	ListItem.UpdateDataSlider("Y", string(int(Translation.Y)), Translation.Y / MaxTranslation,, OnTranslationSliderChanged_Y);
+
+	// Z
+	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
+	ListItem.bAnimateOnInit = false;
+	ListItem.InitListItem();
+	ListItem.UpdateDataSlider("Z", string(int(Translation.Z)), Translation.Z / MaxTranslation,, OnTranslationSliderChanged_Z);
 
 	List.RealizeItems();
 	List.RealizeList();
@@ -139,21 +155,99 @@ private function OnSizeSliderChanged(UISlider sliderControl)
 	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
 }
 
+private function OnTranslationSliderChanged_X(UISlider sliderControl)
+{
+	local name PartName;
+	local vector Translation;
+	local ArmorSizeStruct ArmorSize;
+
+	PartName = GetPartName();
+	if (PartName == '')
+		return;
+
+	class'Help'.static.FindArmorSize(UnitState, PartName, CustomizeCategory, ArmorSize);
+	Translation = ArmorSize.Translation;
+
+	Translation.X = MaxTranslation * sliderControl.percent / 100.0f;
+
+	sliderControl.SetText(string(int(Translation.X)));
+
+	class'Help'.static.SetPartTranslation(UnitState, PartName, CustomizeCategory, Translation);
+
+	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
+}
+private function OnTranslationSliderChanged_Y(UISlider sliderControl)
+{
+	local name PartName;
+	local vector Translation;
+	local ArmorSizeStruct ArmorSize;
+
+	PartName = GetPartName();
+	if (PartName == '')
+		return;
+
+	class'Help'.static.FindArmorSize(UnitState, PartName, CustomizeCategory, ArmorSize);
+	Translation = ArmorSize.Translation;
+
+	Translation.Y = MaxTranslation * sliderControl.percent / 100.0f;
+
+	sliderControl.SetText(string(int(Translation.Y)));
+
+	class'Help'.static.SetPartTranslation(UnitState, PartName, CustomizeCategory, Translation);
+
+	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
+}
+private function OnTranslationSliderChanged_Z(UISlider sliderControl)
+{
+	local name PartName;
+	local vector Translation;
+	local ArmorSizeStruct ArmorSize;
+
+	PartName = GetPartName();
+	if (PartName == '')
+		return;
+
+	class'Help'.static.FindArmorSize(UnitState, PartName, CustomizeCategory, ArmorSize);
+	Translation = ArmorSize.Translation;
+
+	Translation.Z = MaxTranslation * sliderControl.percent / 100.0f;
+
+	sliderControl.SetText(string(int(Translation.Z)));
+
+	class'Help'.static.SetPartTranslation(UnitState, PartName, CustomizeCategory, Translation);
+
+	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
+}
+
 private function OnBodyPartSelected(UIList ContainerList, int ItemIndex)
 {
+	local ArmorSizeStruct ArmorSize;
 	local UIMechaListItem ListItem;
-	local float InitialScale;
+	local float PartSize;
+	local vector Translation;
 
 	OnSelectionChangedOrig(ContainerList, ItemIndex);
 
 	if (ItemIndex == INDEX_NONE)
 		return;
 
-	ListItem = UIMechaListItem(List.GetItem(0));
-	class'Help'.static.GetPartSize(UnitState, GetPartName(), CustomizeCategory, InitialScale);
-	ListItem.UpdateDataSlider(strSize, string(int(InitialScale * 100)), (InitialScale - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
+	class'Help'.static.FindArmorSize(UnitState, GetPartName(), CustomizeCategory, ArmorSize);
+	PartSize = ArmorSize.PartSize;
+	Translation = ArmorSize.Translation;
 
-	`AMLOG("Item Selected:" @ ItemIndex @ GetPartName() @ InitialScale);
+	ListItem = UIMechaListItem(List.GetItem(0));
+	ListItem.UpdateDataSlider(strSize, string(int(PartSize * 100)), (PartSize - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
+
+	ListItem = UIMechaListItem(List.GetItem(1));
+	ListItem.UpdateDataSlider("X", string(int(Translation.X)), Translation.X / MaxTranslation,, OnTranslationSliderChanged_X);
+
+	ListItem = UIMechaListItem(List.GetItem(2));
+	ListItem.UpdateDataSlider("Y", string(int(Translation.Y)), Translation.Y / MaxTranslation,, OnTranslationSliderChanged_Y);
+
+	ListItem = UIMechaListItem(List.GetItem(3));
+	ListItem.UpdateDataSlider("Z", string(int(Translation.Z)), Translation.Z / MaxTranslation,, OnTranslationSliderChanged_Z);
+
+	`AMLOG("Item Selected:" @ ItemIndex @ GetPartName() @ PartSize);
 
 	//Hide();
 	self.SetTimer(TimeBetweenPawnUpdates, false, nameof(AcquirePawnAndResize), self);
@@ -250,26 +344,3 @@ private function name GetPartName()
 	}
 	return '';
 }
-
-/*
-private function OnPositionSliderChanged(UISlider sliderControl)
-{
-	local name PartName;
-	local int Position;
-
-	Position = MaxPosition * sliderControl.percent / 100.0f;
-
-	sliderControl.SetText(string(Position));
-
-	PartName = GetPartName();
-	if (PartName == '')
-		return;
-
-	class'Help'.static.SetPartPosition(UnitState, PartName, Position);
-
-	UnitState = CustomizeScreen.GetUnit();
-	// TODO: Update unit state on Customize Screen? Or in customize manager?
-
-	UnitPawn.DLCAppendSockets();
-}
-*/

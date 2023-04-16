@@ -6,8 +6,8 @@
 /*
 TODO: 
 1. When resizing legs, do not add translation to legs, add translation to every other part instead.
-2. Add translation sliders.
 3. Allow resizing entire pawn.
+4. Find a different place in the UI for the panel.
 4. Allow resizing head and head props
 4. When resizing arms, resize weapons as well.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
@@ -110,14 +110,18 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 
 static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp)
 {
-	local float		PartScale;
-	local vector	Translation;
+	local ArmorSizeStruct ArmorSize;
+	local float	PartSize;
+	local vector Translation;
 
-	if (class'Help'.static.GetPartSize(UnitState, PartName, Category, PartScale))
+	if (FindArmorSize(UnitState, PartName, Category, ArmorSize))
 	{
-		MeshComp.SetScale(PartScale);
+		PartSize = ArmorSize.PartSize;
+		Translation = ArmorSize.Translation;
 
-		Translation.Z = (1 - PartScale) * 100;
+		MeshComp.SetScale(PartSize);
+
+		Translation.Z += (1 - PartSize) * 100;
 		MeshComp.SetTranslation(Translation);
 	}
 	else
@@ -156,22 +160,43 @@ static final function bool FindArmorSize(XComGameState_Unit UnitState, const nam
 	return false;
 } 
 
-/*
-static final function SetPartPosition(XComGameState_Unit UnitState, const name PartName, const float FloatValue)
+static final function SetPartTranslation(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, const vector Translation)
 {
-	local XComGameState			NewGameState;
-	local XComGameState_Unit	NewUnitState;
-	local name					ValueName;
+	local XComGameState				NewGameState;
+	local XComGameState_ResizeArmor StateObject;
+	local ArmorSizeStruct			ArmorSize;
+	local int i;
 
-	ValueName = name(PartName @ default.PositionSuffix); 
+	`AMLOG("Setting translation:" @ Translation.X @ Translation.Y @ Translation.Z @ PartName);
 
-	`AMLOG("Setting position:" @ FloatValue @ PartName);
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Setting translation:" @ Translation.X @ Translation.Y @ Translation.Z @ PartName);
+	StateObject = class'XComGameState_ResizeArmor'.static.GetOrCreateAndPrep(NewGameState);
 
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Set Part Size:" @ PartName @ FloatValue);
-	NewUnitState = XComGameState_Unit(NewGameState.ModifyStateObject(UnitState.Class, UnitState.ObjectID));
-	NewUnitState.SetUnitFloatValue(ValueName, FloatValue, eCleanup_Never);
+	for (i = 0; i < StateObject.ArmorSizes.Length; i++)
+	{
+		if (StateObject.ArmorSizes[i].UnitID == UnitState.ObjectID &&
+			StateObject.ArmorSizes[i].PartName == PartName &&
+			StateObject.ArmorSizes[i].Category == Category)
+		{
+			StateObject.ArmorSizes[i].Translation = Translation;
+			`GAMERULES.SubmitGameState(NewGameState);
+			return;
+		}
+	}
+
+	ArmorSize.UnitID = UnitState.ObjectID;
+	ArmorSize.PartName = PartName;
+	ArmorSize.Category = Category;
+	ArmorSize.Translation = Translation;
+
+	StateObject.ArmorSizes.AddItem(ArmorSize);
+
 	`GAMERULES.SubmitGameState(NewGameState);
 }
+
+
+/*
+
 static final function bool GetPartPosition(XComGameState_Unit UnitState, const name PartName, out vector PartPosition)
 {	
 	local UnitValue UV;
