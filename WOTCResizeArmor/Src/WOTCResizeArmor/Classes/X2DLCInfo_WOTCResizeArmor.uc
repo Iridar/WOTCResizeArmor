@@ -2,17 +2,17 @@ class X2DLCInfo_WOTCResizeArmor extends X2DownloadableContentInfo;
 
 exec function SetOffset(int X, int Y)
 {	
-	class'UIPanel_ResizeArmor'.default.DefaultOffsetX = X;
-	class'UIPanel_ResizeArmor'.default.DefaultOffsetY = Y;
+	class'UIPanel_ResizeArmor'.default.defaultOffsetX = X;
+	class'UIPanel_ResizeArmor'.default.defaultOffsetY = Y;
 }
 
 exec function SetWidth(int X)
 {	
-	class'UIPanel_ResizeArmor'.default.DefaultWidth = X;
+	class'UIPanel_ResizeArmor'.default.defaultWidth = X;
 }
 exec function SetHeight(int X)
 {	
-	class'UIPanel_ResizeArmor'.default.DefaultHeight = X;
+	class'UIPanel_ResizeArmor'.default.defaultHeight = X;
 }
 
 static function string DLCAppendSockets(XComUnitPawn Pawn)

@@ -11,14 +11,14 @@ var private delegate<OnItemSelectedCallback>	OnSelectionChangedOrig;
 var private UIList List;
 var private UIBGBox ListBG;
 
-var config int DefaultWidth;
-var config int DefaultHeight;
-var config int DefaultOffsetX;
-var config int DefaultOffsetY;
+var config int defaultWidth;
+var config int defaultHeight;
+var config int defaultOffsetX;
+var config int defaultOffsetY;
 var private config float TimeBetweenPawnUpdates;
 var private config float MinSize;
 var private config float MaxSize;
-var private config int MaxTranslation;
+var private config float MaxTranslation;
 
 var private localized string strSize;
 
@@ -74,14 +74,14 @@ private function DelayedInit()
 	OnSelectionChangedOrig = CustomizeScreen.List.OnSelectionChanged;
 	CustomizeScreen.List.OnSelectionChanged = OnBodyPartSelected;
 
-	SetPosition(DefaultOffsetX, DefaultOffsetY);
+	SetPosition(defaultOffsetX, defaultOffsetY);
 
 	ListBG = Spawn(class'UIBGBox', self);
 	ListBG.LibID = class'UIUtilities_Controls'.const.MC_X2Background;
 	ListBG.InitBG();
 	ListBG.SetAlpha(80);
-	ListBG.SetWidth(DefaultWidth + 10);
-	ListBG.SetHeight(DefaultHeight + 10);
+	ListBG.SetWidth(defaultWidth + 10);
+	ListBG.SetHeight(defaultHeight + 10);
 	
 	//ListBG.ProcessMouseEvents(List.OnChildMouseEvent);
 
@@ -92,8 +92,8 @@ private function DelayedInit()
 	List.Navigator.LoopSelection = false;
 	List.ItemPadding = 5;
 	List.SetPosition(5, 5);
-	List.SetWidth(DefaultWidth);
-	List.SetHeight(DefaultHeight);
+	List.SetWidth(defaultWidth);
+	List.SetHeight(defaultHeight);
 
 	class'Help'.static.FindArmorSize(UnitState, GetPartName(), CustomizeCategory, ArmorSize);
 	PartSize = ArmorSize.PartSize;
@@ -111,19 +111,19 @@ private function DelayedInit()
 	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	ListItem.bAnimateOnInit = false;
 	ListItem.InitListItem();
-	ListItem.UpdateDataSlider("X", string(int(Translation.X)), Translation.X / MaxTranslation,, OnTranslationSliderChanged_X);
+	ListItem.UpdateDataSlider("X", TruncateFloat(Translation.X), GetSliderPercentFromTranslation(Translation.X),, OnTranslationSliderChanged_X);
 
 	// Y
 	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	ListItem.bAnimateOnInit = false;
 	ListItem.InitListItem();
-	ListItem.UpdateDataSlider("Y", string(int(Translation.Y)), Translation.Y / MaxTranslation,, OnTranslationSliderChanged_Y);
+	ListItem.UpdateDataSlider("Y", TruncateFloat(Translation.Y), GetSliderPercentFromTranslation(Translation.Y),, OnTranslationSliderChanged_Y);
 
 	// Z
 	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	ListItem.bAnimateOnInit = false;
 	ListItem.InitListItem();
-	ListItem.UpdateDataSlider("Z", string(int(Translation.Z)), Translation.Z / MaxTranslation,, OnTranslationSliderChanged_Z);
+	ListItem.UpdateDataSlider("Z", TruncateFloat(Translation.Z), GetSliderPercentFromTranslation(Translation.Z),, OnTranslationSliderChanged_Z);
 
 	List.RealizeItems();
 	List.RealizeList();
@@ -133,6 +133,13 @@ private function DelayedInit()
 	Show();
 }
 
+private function int GetSliderPercentFromTranslation(const float Translation)
+{	
+	// Tranlsation = -MaxTranslation, Percent = 0
+	// Translation = 0, Percent = 50
+	// Translation = MaxTranslation, Percent = 100
+	return Round(50.0f * (Translation / MaxTranslation + 1.0f));
+}
 
 private function OnSizeSliderChanged(UISlider sliderControl)
 {
@@ -167,9 +174,11 @@ private function OnTranslationSliderChanged_X(UISlider sliderControl)
 	class'Help'.static.FindArmorSize(UnitState, PartName, CustomizeCategory, ArmorSize);
 	Translation = ArmorSize.Translation;
 
-	Translation.X = MaxTranslation * sliderControl.percent / 100.0f;
+	`AMLOG("Slider percent:" @ sliderControl.percent);
 
-	sliderControl.SetText(string(int(Translation.X)));
+	Translation.X = GetTranslationFromSliderPercent(sliderControl.percent);
+
+	sliderControl.SetText(TruncateFloat(Translation.X));
 
 	class'Help'.static.SetPartTranslation(UnitState, PartName, CustomizeCategory, Translation);
 
@@ -188,9 +197,9 @@ private function OnTranslationSliderChanged_Y(UISlider sliderControl)
 	class'Help'.static.FindArmorSize(UnitState, PartName, CustomizeCategory, ArmorSize);
 	Translation = ArmorSize.Translation;
 
-	Translation.Y = MaxTranslation * sliderControl.percent / 100.0f;
+	Translation.Y = GetTranslationFromSliderPercent(sliderControl.percent);
 
-	sliderControl.SetText(string(int(Translation.Y)));
+	sliderControl.SetText(TruncateFloat(Translation.Y));
 
 	class'Help'.static.SetPartTranslation(UnitState, PartName, CustomizeCategory, Translation);
 
@@ -209,13 +218,26 @@ private function OnTranslationSliderChanged_Z(UISlider sliderControl)
 	class'Help'.static.FindArmorSize(UnitState, PartName, CustomizeCategory, ArmorSize);
 	Translation = ArmorSize.Translation;
 
-	Translation.Z = MaxTranslation * sliderControl.percent / 100.0f;
+	Translation.Z = GetTranslationFromSliderPercent(sliderControl.percent);
 
-	sliderControl.SetText(string(int(Translation.Z)));
+	sliderControl.SetText(TruncateFloat(Translation.Z));
 
 	class'Help'.static.SetPartTranslation(UnitState, PartName, CustomizeCategory, Translation);
 
 	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
+}
+
+private function float GetTranslationFromSliderPercent(int SliderPercent)
+{
+	local float ActualSlider;
+
+	if (SliderPercent == 50)
+		return 0.0f; // Hardcoded middle to avoid dealing with fractions
+
+	// Slider percent goes between 1 and 100, but we need scaling between 0 and 100.
+	ActualSlider = (SliderPercent - 1.0f) * 100.0f / 99.0f;
+	
+	return MaxTranslation * (ActualSlider / 50.0f - 1.0f);
 }
 
 private function OnBodyPartSelected(UIList ContainerList, int ItemIndex)
@@ -238,13 +260,13 @@ private function OnBodyPartSelected(UIList ContainerList, int ItemIndex)
 	ListItem.UpdateDataSlider(strSize, string(int(PartSize * 100)), (PartSize - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
 
 	ListItem = UIMechaListItem(List.GetItem(1));
-	ListItem.UpdateDataSlider("X", string(int(Translation.X)), Translation.X / MaxTranslation,, OnTranslationSliderChanged_X);
+	ListItem.UpdateDataSlider("X", TruncateFloat(Translation.X), GetSliderPercentFromTranslation(Translation.X),, OnTranslationSliderChanged_X);
 
 	ListItem = UIMechaListItem(List.GetItem(2));
-	ListItem.UpdateDataSlider("Y", string(int(Translation.Y)), Translation.Y / MaxTranslation,, OnTranslationSliderChanged_Y);
+	ListItem.UpdateDataSlider("Y", TruncateFloat(Translation.Y), GetSliderPercentFromTranslation(Translation.Y),, OnTranslationSliderChanged_Y);
 
 	ListItem = UIMechaListItem(List.GetItem(3));
-	ListItem.UpdateDataSlider("Z", string(int(Translation.Z)), Translation.Z / MaxTranslation,, OnTranslationSliderChanged_Z);
+	ListItem.UpdateDataSlider("Z", TruncateFloat(Translation.Z), GetSliderPercentFromTranslation(Translation.Z),, OnTranslationSliderChanged_Z);
 
 	`AMLOG("Item Selected:" @ ItemIndex @ GetPartName() @ PartSize);
 
@@ -342,4 +364,40 @@ private function name GetPartName()
 		return '';
 	}
 	return '';
+}
+
+static function string TruncateFloat(float value)
+{
+	local string FloatString, TempString;
+	local int i;
+	local float TempFloat, TestFloat;
+
+	TempFloat = value;
+	for (i=0; i < 1; i++)
+	{
+		TempFloat *= 10.0;
+	}
+	TempFloat = Round(TempFloat);
+	for (i=0; i < 1; i++)
+	{
+		TempFloat /= 10.0;
+	}
+
+	TempString = string(TempFloat);
+	for (i = InStr(TempString, ".") + 1; i < Len(TempString) ; i++)
+	{
+		FloatString = Left(TempString, i);
+		TestFloat = float(FloatString);
+		if (TempFloat ~= TestFloat)
+		{
+			break;
+		}
+	}
+
+	if (Right(FloatString, 1) == ".")
+	{
+		FloatString $= "0";
+	}
+
+	return FloatString;
 }
