@@ -1,10 +1,9 @@
 class UIPanel_ResizeArmor extends UIPanel config(UI);
 
-var UICustomize_Trait	CustomizeScreen;
-var UICustomize_Body	CustomizeBody;
+var UICustomize_Trait CustomizeScreen;
 
-var private EUICustomizeCategory CustomizeCategory;
-
+var private UICustomize_Body					CustomizeBody;
+var private EUICustomizeCategory				CustomizeCategory;
 var private XComGameState_Unit					UnitState;
 var private XComHumanPawn						UnitPawn;
 var private delegate<OnItemSelectedCallback>	OnSelectionChangedOrig;
@@ -12,11 +11,11 @@ var private delegate<OnItemSelectedCallback>	OnSelectionChangedOrig;
 var private UIList List;
 var private UIBGBox ListBG;
 
+var config int DefaultWidth;
+var config int DefaultHeight;
 var config int DefaultOffsetX;
 var config int DefaultOffsetY;
 var private config float TimeBetweenPawnUpdates;
-
-
 var private config float MinSize;
 var private config float MaxSize;
 var private config int MaxTranslation;
@@ -81,20 +80,20 @@ private function DelayedInit()
 	ListBG.LibID = class'UIUtilities_Controls'.const.MC_X2Background;
 	ListBG.InitBG();
 	ListBG.SetAlpha(80);
-	ListBG.SetWidth(582);
-	ListBG.SetHeight(250);
+	ListBG.SetWidth(DefaultWidth + 10);
+	ListBG.SetHeight(DefaultHeight + 10);
 	
 	//ListBG.ProcessMouseEvents(List.OnChildMouseEvent);
 
 	List = Spawn(class'UIList', self);
 	List.bAnimateOnInit = false;
 	List.bStickyHighlight = false;
+	List.InitList();
 	List.Navigator.LoopSelection = false;
 	List.ItemPadding = 5;
-	List.SetPosition(0, 5);
-	List.InitList();
-	List.SetWidth(582);
-	List.SetHeight(240);
+	List.SetPosition(5, 5);
+	List.SetWidth(DefaultWidth);
+	List.SetHeight(DefaultHeight);
 
 	class'Help'.static.FindArmorSize(UnitState, GetPartName(), CustomizeCategory, ArmorSize);
 	PartSize = ArmorSize.PartSize;

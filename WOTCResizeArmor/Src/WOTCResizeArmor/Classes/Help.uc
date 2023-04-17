@@ -7,11 +7,11 @@
 TODO: 
 1. When resizing legs, do not add translation to legs, add translation to every other part instead.
 3. Allow resizing entire pawn.
-4. Find a different place in the UI for the panel.
 4. Allow resizing head and head props
-4. When resizing arms, resize weapons as well.
+4. When resizing arms, resize weapons as well. Might not be possible? Unless we resize the entire pawn mesh, and then all other parts individually in the opposite direction to compensate.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
-
+6. drag and drop the panel
+7. Make position sliders work into negative too
 */
 
 class Help extends Object abstract;

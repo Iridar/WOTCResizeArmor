@@ -6,6 +6,15 @@ exec function SetOffset(int X, int Y)
 	class'UIPanel_ResizeArmor'.default.DefaultOffsetY = Y;
 }
 
+exec function SetWidth(int X)
+{	
+	class'UIPanel_ResizeArmor'.default.DefaultWidth = X;
+}
+exec function SetHeight(int X)
+{	
+	class'UIPanel_ResizeArmor'.default.DefaultHeight = X;
+}
+
 static function string DLCAppendSockets(XComUnitPawn Pawn)
 {
 	local XComGameState_Unit UnitState;
