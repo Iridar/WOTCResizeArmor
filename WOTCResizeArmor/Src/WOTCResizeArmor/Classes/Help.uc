@@ -5,12 +5,11 @@
 
 /*
 TODO: 
-1. When resizing legs, do not add translation to legs, add translation to every other part instead.
 3. Allow resizing entire pawn.
 4. Allow resizing head and head props
 4. When resizing arms, resize weapons as well. Might not be possible? Unless we resize the entire pawn mesh, and then all other parts individually in the opposite direction to compensate.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
-6. drag and drop the panel
+6. drag and drop the panel -> seems to be impossible, maybe just make an MCM toggle
 */
 
 class Help extends Object abstract;
@@ -113,21 +112,25 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	local float	PartSize;
 	local vector Translation;
 
-	if (FindArmorSize(UnitState, PartName, Category, ArmorSize))
+	FindArmorSize(UnitState, PartName, Category, ArmorSize);
+	PartSize = ArmorSize.PartSize;
+	Translation = ArmorSize.Translation;
+
+	MeshComp.SetScale(PartSize);
+
+	if (Category != eUICustomizeCat_Legs)
 	{
-		PartSize = ArmorSize.PartSize;
-		Translation = ArmorSize.Translation;
-
-		MeshComp.SetScale(PartSize);
-
+		// If this part isn't legs, then adjust its position based on its scale
 		Translation.Z += (1 - PartSize) * 100;
-		MeshComp.SetTranslation(Translation);
+		// And adjust poistion based on scale of legs, if they are scaled.
+		if (FindArmorSize(UnitState, UnitState.kAppearance.nmLegs, eUICustomizeCat_Legs, ArmorSize))
+		{
+			PartSize = ArmorSize.PartSize;
+			Translation.Z -= (1 - PartSize) * 50;
+		}
 	}
-	else
-	{
-		MeshComp.SetScale(1.0f);
-		MeshComp.SetTranslation(Translation);
-	}
+	MeshComp.SetTranslation(Translation);
+
 	//if (class'Help'.static.GetPartPosition(UnitState, PartName, Translation))
 	//{
 	//	`AMLOG("Settin torso position:" @ Translation.Z);
