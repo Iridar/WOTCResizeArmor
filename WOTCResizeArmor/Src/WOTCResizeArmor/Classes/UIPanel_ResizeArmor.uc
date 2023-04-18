@@ -3,10 +3,11 @@ class UIPanel_ResizeArmor extends UIPanel config(UI);
 var UICustomize_Trait CustomizeScreen;
 
 var private UICustomize_Body					CustomizeBody;
-var private EUICustomizeCategory				CustomizeCategory;
 var private XComGameState_Unit					UnitState;
-var private XComHumanPawn						UnitPawn;
 var private delegate<OnItemSelectedCallback>	OnSelectionChangedOrig;
+
+var protectedwrite EUICustomizeCategory			CustomizeCategory;
+var protectedwrite XComHumanPawn				UnitPawn;
 
 var private UIList List;
 var private UIBGBox ListBG;
@@ -40,8 +41,7 @@ private function DelayedInit()
 	local float PartSize;
 	local vector Translation;
 
-	CustomizeBody = UICustomize_Body(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_Body'));
-	if (CustomizeBody == none)
+	if (!GetParentCustomizeScreen())
 	{
 		self.Remove(); // Commit sudoku 
 		return;
@@ -131,6 +131,12 @@ private function DelayedInit()
 	`AMLOG("Inited panel for unit:" @ UnitState.GetFullName());
 
 	Show();
+}
+
+protected function bool GetParentCustomizeScreen()
+{
+	CustomizeBody = UICustomize_Body(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_Body'));
+	return CustomizeBody != none;
 }
 
 private function int GetSliderPercentFromTranslation(const float Translation)
@@ -291,7 +297,7 @@ private function AcquirePawnAndResize()
 
 
 
-private function EUICustomizeCategory GetCustomizeCategory()
+protected function EUICustomizeCategory GetCustomizeCategory()
 {
 	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeTorso))
 		return eUICustomizeCat_Torso;
@@ -332,7 +338,7 @@ private function EUICustomizeCategory GetCustomizeCategory()
 	return eUICustomizeCat_FirstName;
 }
 
-private function name GetPartName()
+protected function name GetPartName()
 {
 	switch(CustomizeCategory)
 	{

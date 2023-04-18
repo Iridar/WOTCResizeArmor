@@ -5,8 +5,8 @@
 
 /*
 TODO: 
+1. Make the list less wide by making a new MechaListItem class. Or just resizing stuff.
 3. Allow resizing entire pawn.
-4. Allow resizing head and head props
 4. When resizing arms, resize weapons as well. Might not be possible? Unless we resize the entire pawn mesh, and then all other parts individually in the opposite direction to compensate.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
 6. drag and drop the panel -> seems to be impossible, maybe just make an MCM toggle
@@ -89,9 +89,19 @@ static final function bool GetPartSize(XComGameState_Unit UnitState, const name 
 	return false;
 }
 
-
 static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
+	// Cannot resize or translate the head, because every other part is attached to it.
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kHeadMeshComponent);
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kEyeMC);
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kTeethMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmHelmet,			eUICustomizeCat_Helmet,					Pawn.m_kHelmetMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmHaircut,			eUICustomizeCat_Hairstyle,				Pawn.m_kHairMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmBeard,			eUICustomizeCat_FacialHair,				Pawn.m_kBeardMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmFacePropUpper,	eUICustomizeCat_FaceDecorationUpper,	Pawn.m_kUpperFacialMC);
+	ResizeComponent(UnitState, UnitState.kAppearance.nmFacePropLower,	eUICustomizeCat_FaceDecorationLower,	Pawn.m_kLowerFacialMC);
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmTorso,			eUICustomizeCat_Hairstyle,			Pawn.HairComponent);
+
 	ResizeComponent(UnitState, UnitState.kAppearance.nmTorso,			eUICustomizeCat_Torso,			Pawn.m_kTorsoComponent);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmArms,			eUICustomizeCat_Arms,			Pawn.m_kArmsMC);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmLegs,			eUICustomizeCat_Legs,			Pawn.m_kLegsMC);
@@ -112,9 +122,17 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	local float	PartSize;
 	local vector Translation;
 
+	if (PartName == '' || MeshComp == none)
+		return;
+
 	FindArmorSize(UnitState, PartName, Category, ArmorSize);
 	PartSize = ArmorSize.PartSize;
 	Translation = ArmorSize.Translation;
+
+	if (MeshComp.Scale != PartSize)
+	{
+		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Scale @ "->" @ PartSize);
+	}
 
 	MeshComp.SetScale(PartSize);
 
@@ -129,13 +147,12 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 			Translation.Z -= (1 - PartSize) * 50;
 		}
 	}
-	MeshComp.SetTranslation(Translation);
 
-	//if (class'Help'.static.GetPartPosition(UnitState, PartName, Translation))
-	//{
-	//	`AMLOG("Settin torso position:" @ Translation.Z);
-	//	
-	//}
+	if (MeshComp.Translation != Translation)
+	{
+		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Translation.X @ MeshComp.Translation.Y @ MeshComp.Translation.Z @ "->" @ Translation.X @ Translation.Y @ Translation.Z);
+	}
+	MeshComp.SetTranslation(Translation);
 }
 
 

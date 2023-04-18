@@ -18,13 +18,20 @@ event OnInit(UIScreen Screen)
 	if (CustomizeScreen == none)
 		return;
 
-	`AMLOG("Spawning panel on screen:" @ Screen.Class.Name);
-	
-	FindAndRemovePanel();
-	ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeArmor', `HQPRES.m_kAvengerHUD);
+	if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_Body'))
+	{
+		FindAndRemovePanel();
+		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeArmor', `HQPRES.m_kAvengerHUD);
+	}
+	else if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_Head'))
+	{
+		FindAndRemovePanel();
+		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeHead', `HQPRES.m_kAvengerHUD);
+	}
+
+	`AMLOG("Spawned panel on screen:" @ Screen.Class.Name);
 	ResizeArmorPanel.CustomizeScreen = CustomizeScreen;
 	ResizeArmorPanel.InitPanel();
-
 	PathToPanel = PathName(ResizeArmorPanel);
 }
 event OnReceiveFocus(UIScreen Screen)
