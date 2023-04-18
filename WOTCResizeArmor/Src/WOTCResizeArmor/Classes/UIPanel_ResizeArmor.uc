@@ -26,6 +26,7 @@ var private config float MaxTranslation;
 
 var private localized string strSize;
 var private localized string strButtonText;
+var private localized string strTooltip;
 var bool bShowHorizontalTranslationSliders;
 
 delegate OnItemSelectedCallback(UIList _list, int itemIndex);
@@ -157,6 +158,7 @@ private function DelayedInit()
 	ToggleButton.OnSizeRealized = OnButtonSizeRealized;
 	ToggleButton.fButtonHoldMaxTime = 0.5f;
 	ToggleButton.OnHoldDelegate = OnToggleButtonHold;
+	ToggleButton.SetTooltipText(strTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
 
 	`AMLOG("Inited panel for unit:" @ UnitState.GetFullName());
 
@@ -180,10 +182,16 @@ private function OnToggleButtonHold(UIButton Button)
 {
 	local UIPanel_DragAndDrop DragAndDrop;
 
+	Button.SetDisabled(true);
+
 	DragAndDrop = Spawn(class'UIPanel_DragAndDrop', self);
 	DragAndDrop.InitPanel();
-	DragAndDrop.SetPosition(ToggleButton.X, ToggleButton.Y);
+	DragAndDrop.SetPosition(ToggleButton.X + ToggleButton.Width / 2, ToggleButton.Y);
 	DragAndDrop.OnDragFinishedFn = OnDragFinished;
+	DragAndDrop.iClampLeft = 0;
+	DragAndDrop.iClampRight = 1920 - ListBG.Width;
+	DragAndDrop.iClampBottom = 1080 - ListBG.Height - ToggleButton.Height - 10;
+	DragAndDrop.iClampTop = 0;
 
 	Button.bMouseDown = false;
 }
@@ -194,6 +202,7 @@ private function OnDragFinished()
 	class'ConfigHolder'.default.customOffsetX = X;
 	class'ConfigHolder'.default.customOffsetY = Y;
 	class'ConfigHolder'.static.CommitChanges();
+	ToggleButton.SetDisabled(false);
 	//defaultOffsetX = X;
 	//defaultOffsetY = Y;
 	//default.defaultOffsetX = X;
@@ -203,6 +212,9 @@ private function OnDragFinished()
 
 private function OnButtonMouseEvent(UIPanel Button, int cmd)
 {
+	if (UIButton(Button).IsDisabled)
+		return;
+
 	if (cmd == class'UIUtilities_Input'.const.FXS_L_MOUSE_UP)
 	{
 		if (List.bIsVisible)

@@ -9,7 +9,6 @@ TODO:
 3. MCM Support?
 4. When resizing arms, resize weapons as well. Might not be possible? Unless we resize the entire pawn mesh, and then all other parts individually in the opposite direction to compensate.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
-6. drag and drop the panel -> seems to be impossible, maybe just make an MCM toggle
 */
 
 class Help extends Object abstract;

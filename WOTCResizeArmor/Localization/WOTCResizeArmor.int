@@ -1,3 +1,4 @@
 [UIPanel_ResizeArmor]
 strSize = "Size"
 strButtonText = "Toggle Size Panel"
+strTooltip = "Click to toggle the panel's visibility. Hold to enter dragging mode. While in dragging mode, mouse over the arrow icons to reposition the panel. Click the arrow icons to reposition faster. When done, click at the icon in the center."
