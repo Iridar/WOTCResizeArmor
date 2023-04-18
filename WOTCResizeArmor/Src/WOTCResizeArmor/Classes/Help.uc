@@ -6,13 +6,16 @@
 /*
 TODO: 
 1. Make the list less wide by making a new MechaListItem class. Or just resizing stuff.
-3. Allow resizing entire pawn.
+2. Add a hide/show button.
+3. MCM Support?
 4. When resizing arms, resize weapons as well. Might not be possible? Unless we resize the entire pawn mesh, and then all other parts individually in the opposite direction to compensate.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
 6. drag and drop the panel -> seems to be impossible, maybe just make an MCM toggle
 */
 
 class Help extends Object abstract;
+
+var privatewrite name PawnPartName;
 
 struct ArmorSizeStruct
 {
@@ -91,6 +94,8 @@ static final function bool GetPartSize(XComGameState_Unit UnitState, const name 
 
 static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
+	
+	ResizeComponent(UnitState, default.PawnPartName,					eUICustomizeCat_Face,					Pawn.Mesh);
 	// Cannot resize or translate the head, because every other part is attached to it.
 	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kHeadMeshComponent);
 	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kEyeMC);
@@ -136,7 +141,7 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 
 	MeshComp.SetScale(PartSize);
 
-	if (Category != eUICustomizeCat_Legs)
+	if (Category != eUICustomizeCat_Legs && Category != eUICustomizeCat_Face)
 	{
 		// If this part isn't legs, then adjust its position based on its scale
 		Translation.Z += (1 - PartSize) * 100;
@@ -148,6 +153,10 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 		}
 	}
 
+	if (Category == eUICustomizeCat_Face)
+	{
+		Translation.Z -= 64;
+	}
 	if (MeshComp.Translation != Translation)
 	{
 		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Translation.X @ MeshComp.Translation.Y @ MeshComp.Translation.Z @ "->" @ Translation.X @ Translation.Y @ Translation.Z);
@@ -697,4 +706,10 @@ static final function bool IsItemUniqueEquipInSlot(X2ItemTemplateManager ItemMgr
 	WeaponTemplate = X2WeaponTemplate(ItemTemplate);
 
 	return ItemMgr.ItemCategoryIsUniqueEquip(ItemTemplate.ItemCat) || WeaponTemplate != none && ItemMgr.ItemCategoryIsUniqueEquip(WeaponTemplate.WeaponCat);
+}
+
+
+defaultproperties
+{
+	PawnPartName = "IRI_EntirePawn"
 }

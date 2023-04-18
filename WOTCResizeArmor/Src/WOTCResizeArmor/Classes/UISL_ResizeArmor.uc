@@ -5,14 +5,20 @@ var private string PathToPanel;
 event OnInit(UIScreen Screen)
 {
 	local UICustomize_Trait		CustomizeScreen;
-	//local UICustomize_Body		CustomizeBody;
+	local UICustomize_Body		CustomizeBody;
 	local UIPanel_ResizeArmor	ResizeArmorPanel;
 
-	//CustomizeBody = UICustomize_Body(Screen);
-	//if (CustomizeBody != none)
-	//{	
-	//	SpawnPanel(Screen);
-	//}
+	CustomizeBody = UICustomize_Body(Screen);
+	if (CustomizeBody != none)
+	{
+		FindAndRemovePanel();
+		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizePawn', `HQPRES.m_kAvengerHUD);
+		ResizeArmorPanel.CustomizeScreen = CustomizeBody;
+		ResizeArmorPanel.InitPanel();
+		PathToPanel = PathName(ResizeArmorPanel);
+		return;
+	}
+	
 
 	CustomizeScreen = UICustomize_Trait(Screen);
 	if (CustomizeScreen == none)
@@ -65,7 +71,6 @@ event OnLoseFocus(UIScreen Screen)
 
 private function SpawnPanel(UIScreen Screen)
 {
-	
 	FindAndRemovePanel();
 }
 

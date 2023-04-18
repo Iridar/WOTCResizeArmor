@@ -35,6 +35,9 @@
     <Content Include="Src\WOTCResizeArmor\Classes\UIPanel_ResizeHead.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\WOTCResizeArmor\Classes\UIPanel_ResizePawn.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\WOTCResizeArmor\Classes\UISL_ResizeArmor.uc">
       <SubType>Content</SubType>
     </Content>

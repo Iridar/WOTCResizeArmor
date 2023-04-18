@@ -1,6 +1,6 @@
 class UIPanel_ResizeArmor extends UIPanel config(UI);
 
-var UICustomize_Trait CustomizeScreen;
+var UICustomize CustomizeScreen;
 
 var private UICustomize_Body					CustomizeBody;
 var private XComGameState_Unit					UnitState;
@@ -22,12 +22,18 @@ var private config float MaxSize;
 var private config float MaxTranslation;
 
 var private localized string strSize;
+var bool bShowHorizontalTranslationSliders;
 
 delegate OnItemSelectedCallback(UIList _list, int itemIndex);
 
 simulated function UIPanel InitPanel(optional name InitName, optional name InitLibID)
 {
 	super.InitPanel(InitName, InitLibID);
+
+	if (!bShowHorizontalTranslationSliders)
+	{
+		defaultHeight /= 2;
+	}
 
 	Hide();
 	self.SetTimer(0.25f, false, nameof(DelayedInit), self);
@@ -107,6 +113,8 @@ private function DelayedInit()
 	class'Help'.static.GetPartSize(UnitState, GetPartName(), CustomizeCategory, PartSize);
 	ListItem.UpdateDataSlider(strSize, string(int(PartSize * 100)), (PartSize - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
 
+	if (bShowHorizontalTranslationSliders)
+	{
 	// X
 	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	ListItem.bAnimateOnInit = false;
@@ -118,7 +126,7 @@ private function DelayedInit()
 	ListItem.bAnimateOnInit = false;
 	ListItem.InitListItem();
 	ListItem.UpdateDataSlider("Y", TruncateFloat(Translation.Y), GetSliderPercentFromTranslation(Translation.Y),, OnTranslationSliderChanged_Y);
-
+	}
 	// Z
 	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
 	ListItem.bAnimateOnInit = false;
@@ -161,8 +169,6 @@ private function OnSizeSliderChanged(UISlider sliderControl)
 		return;
 
 	class'Help'.static.SetPartSize(UnitState, PartName, CustomizeCategory, Scale);
-
-	//CustomizeScreen.CustomizeManager.Refresh(CustomizeScreen.CustomizeManager.UpdatedUnitState, UnitState);
 
 	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
 }
@@ -265,12 +271,14 @@ private function OnBodyPartSelected(UIList ContainerList, int ItemIndex)
 	ListItem = UIMechaListItem(List.GetItem(0));
 	ListItem.UpdateDataSlider(strSize, string(int(PartSize * 100)), (PartSize - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
 
+	if (bShowHorizontalTranslationSliders)
+	{
 	ListItem = UIMechaListItem(List.GetItem(1));
 	ListItem.UpdateDataSlider("X", TruncateFloat(Translation.X), GetSliderPercentFromTranslation(Translation.X),, OnTranslationSliderChanged_X);
 
 	ListItem = UIMechaListItem(List.GetItem(2));
 	ListItem.UpdateDataSlider("Y", TruncateFloat(Translation.Y), GetSliderPercentFromTranslation(Translation.Y),, OnTranslationSliderChanged_Y);
-
+	}
 	ListItem = UIMechaListItem(List.GetItem(3));
 	ListItem.UpdateDataSlider("Z", TruncateFloat(Translation.Z), GetSliderPercentFromTranslation(Translation.Z),, OnTranslationSliderChanged_Z);
 
@@ -293,9 +301,6 @@ private function AcquirePawnAndResize()
 		class'Help'.static.ResizeArmor(UnitState, UnitPawn);
 	}
 }
-
-
-
 
 protected function EUICustomizeCategory GetCustomizeCategory()
 {
@@ -406,4 +411,9 @@ static function string TruncateFloat(float value)
 	}
 
 	return FloatString;
+}
+
+defaultproperties
+{
+	bShowHorizontalTranslationSliders = true
 }
