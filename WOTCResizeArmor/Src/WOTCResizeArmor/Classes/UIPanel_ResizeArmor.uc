@@ -9,8 +9,8 @@ var private delegate<OnItemSelectedCallback>	OnSelectionChangedOrig;
 var protectedwrite EUICustomizeCategory			CustomizeCategory;
 var protectedwrite XComHumanPawn				UnitPawn;
 
-var private UIList List;
-var private UIBGBox ListBG;
+var private UIList		List;
+var private UIBGBox		ListBG;
 var private UIButton	ToggleButton;
 var private int			ToggleButtonWidth;
 
@@ -18,6 +18,7 @@ var config int defaultWidth;
 var config int defaultHeight;
 var config int defaultOffsetX;
 var config int defaultOffsetY;
+
 var private config float TimeBetweenPawnUpdates;
 var private config float MinSize;
 var private config float MaxSize;
@@ -32,6 +33,15 @@ delegate OnItemSelectedCallback(UIList _list, int itemIndex);
 simulated function UIPanel InitPanel(optional name InitName, optional name InitLibID)
 {
 	super.InitPanel(InitName, InitLibID);
+
+	if (class'ConfigHolder'.default.customOffsetX != 0)
+	{
+		defaultOffsetX = class'ConfigHolder'.default.customOffsetX;
+	}
+	if (class'ConfigHolder'.default.customOffsetY != 0)
+	{
+		defaultOffsetY = class'ConfigHolder'.default.customOffsetY;
+	}
 
 	if (!bShowHorizontalTranslationSliders)
 	{
@@ -145,6 +155,8 @@ private function DelayedInit()
 	ToggleButton.ProcessMouseEvents(OnButtonMouseEvent);
 	ToggleButton.SetText(default.strButtonText);
 	ToggleButton.OnSizeRealized = OnButtonSizeRealized;
+	ToggleButton.fButtonHoldMaxTime = 0.5f;
+	ToggleButton.OnHoldDelegate = OnToggleButtonHold;
 
 	`AMLOG("Inited panel for unit:" @ UnitState.GetFullName());
 
@@ -163,6 +175,31 @@ private function OnButtonSizeRealized()
 		ToggleButton.SetPosition(defaultWidth - ToggleButtonWidth, 0);
 	}
 }
+
+private function OnToggleButtonHold(UIButton Button)
+{
+	local UIPanel_DragAndDrop DragAndDrop;
+
+	DragAndDrop = Spawn(class'UIPanel_DragAndDrop', self);
+	DragAndDrop.InitPanel();
+	DragAndDrop.SetPosition(ToggleButton.X, ToggleButton.Y);
+	DragAndDrop.OnDragFinishedFn = OnDragFinished;
+
+	Button.bMouseDown = false;
+}
+
+private function OnDragFinished()
+{
+	`AMLOG("Saving position to config:" @ X @ Y);
+	class'ConfigHolder'.default.customOffsetX = X;
+	class'ConfigHolder'.default.customOffsetY = Y;
+	class'ConfigHolder'.static.CommitChanges();
+	//defaultOffsetX = X;
+	//defaultOffsetY = Y;
+	//default.defaultOffsetX = X;
+	//default.defaultOffsetY = Y;
+}
+
 
 private function OnButtonMouseEvent(UIPanel Button, int cmd)
 {
