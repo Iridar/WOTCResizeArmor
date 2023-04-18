@@ -1,2 +1,3 @@
 [UIPanel_ResizeArmor]
 strSize = "Size"
+strButtonText = "Toggle Size Panel"

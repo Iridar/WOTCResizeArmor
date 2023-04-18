@@ -11,6 +11,8 @@ var protectedwrite XComHumanPawn				UnitPawn;
 
 var private UIList List;
 var private UIBGBox ListBG;
+var private UIButton	ToggleButton;
+var private int			ToggleButtonWidth;
 
 var config int defaultWidth;
 var config int defaultHeight;
@@ -22,6 +24,7 @@ var private config float MaxSize;
 var private config float MaxTranslation;
 
 var private localized string strSize;
+var private localized string strButtonText;
 var bool bShowHorizontalTranslationSliders;
 
 delegate OnItemSelectedCallback(UIList _list, int itemIndex);
@@ -136,9 +139,48 @@ private function DelayedInit()
 	List.RealizeItems();
 	List.RealizeList();
 
+	ToggleButton = Spawn(class'UIButton', self);
+	ToggleButton.bIsNavigable = false;
+	ToggleButton.InitButton();
+	ToggleButton.ProcessMouseEvents(OnButtonMouseEvent);
+	ToggleButton.SetText(default.strButtonText);
+	ToggleButton.OnSizeRealized = OnButtonSizeRealized;
+
 	`AMLOG("Inited panel for unit:" @ UnitState.GetFullName());
 
 	Show();
+}
+
+private function OnButtonSizeRealized()
+{
+	ToggleButtonWidth = ToggleButton.Width;
+	if (List.bIsVisible)
+	{
+		ToggleButton.SetPosition(defaultWidth - ToggleButtonWidth, defaultHeight + 10);
+	}
+	else
+	{
+		ToggleButton.SetPosition(defaultWidth - ToggleButtonWidth, 0);
+	}
+}
+
+private function OnButtonMouseEvent(UIPanel Button, int cmd)
+{
+	if (cmd == class'UIUtilities_Input'.const.FXS_L_MOUSE_UP)
+	{
+		if (List.bIsVisible)
+		{
+			List.Hide();
+			ListBG.Hide();
+			Button.SetPosition(defaultWidth - ToggleButtonWidth, 0);
+		}
+		else
+		{
+			List.Show();
+			ListBG.Show();
+			Button.SetPosition(defaultWidth - ToggleButtonWidth, defaultHeight + 10);
+		}
+	}
 }
 
 protected function bool GetParentCustomizeScreen()
