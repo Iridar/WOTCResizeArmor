@@ -11,8 +11,8 @@ protected function bool GetParentCustomizeScreen()
 protected function EUICustomizeCategory GetCustomizeCategory()
 {
 	// Cannot resize or translate the head, because every other part is attached to it.
-	//if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeHead.ChangeFace))
-	//	return eUICustomizeCat_Face;
+	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeHead.ChangeFace))
+		return eUICustomizeCat_Face;
 
 	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeHead.ChangeHair))
 		return eUICustomizeCat_Hairstyle;
