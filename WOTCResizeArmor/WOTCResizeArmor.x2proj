@@ -23,7 +23,6 @@
     </Content>
     <Content Include="ReadMe.txt" />
     <Content Include="ModPreview.jpg" />
-    <Content Include="ContentOptions.json" />
     <Content Include="Config\Base\XComEditor.ini" />
     <Content Include="Config\Base\XComEngine.ini" />
     <Content Include="Config\Base\XComGame.ini" />
@@ -49,6 +48,9 @@
     </Content>
     <Content Include="Src\WOTCResizeArmor\Classes\X2DLCInfo_WOTCResizeArmor.uc" />
     <Content Include="Src\WOTCResizeArmor\Classes\Help.uc" />
+    <Content Include="Src\WOTCResizeArmor\Classes\X2EventListener_ResizeArmor.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\WOTCResizeArmor\Classes\XComGameState_ResizeArmor.uc">
       <SubType>Content</SubType>
     </Content>

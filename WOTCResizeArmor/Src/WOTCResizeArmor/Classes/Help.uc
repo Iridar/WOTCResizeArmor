@@ -5,15 +5,17 @@
 
 /*
 TODO: 
-1. Make the list less wide by making a new MechaListItem class. Or just resizing stuff.
 3. MCM Support?
 4. When resizing arms, resize weapons as well. Might not be possible? Unless we resize the entire pawn mesh, and then all other parts individually in the opposite direction to compensate.
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
 */
 
-class Help extends Object abstract;
+// Resizing legs moves all parts except the head
+
+class Help extends Object abstract config(UI);
 
 var privatewrite name PawnPartName;
+var config bool bLog;
 
 struct ArmorSizeStruct
 {

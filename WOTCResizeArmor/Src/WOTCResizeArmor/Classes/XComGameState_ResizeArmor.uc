@@ -2,22 +2,6 @@ class XComGameState_ResizeArmor extends XComGameState_BaseObject;
 
 var array<ArmorSizeStruct> ArmorSizes;
 
-// Copy this to X2DLC Info to automatically create the state object.
-/*
-static event InstallNewCampaign(XComGameState StartState)
-{
-	StartState.CreateNewStateObject(class'XComGameState_ResizeArmor');
-}
-static event OnLoadedSavedGame()
-{
-	local XComGameState NewGameState;
-
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState(default.DLCIdentifier $ " Creating XComGameState_ResizeArmor");
-	NewGameState.CreateNewStateObject(class'XComGameState_ResizeArmor');
-	`XCOMHISTORY.AddGameStateToHistory(NewGameState);
-}
-*/
-
 // ------------------------------------------------------------
 // 							GETTERS
 
