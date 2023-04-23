@@ -10,8 +10,6 @@ TODO:
 5. Progressive resizing: when resizing a body part, also resize all other parts attached to it.
 */
 
-// Resizing legs moves all parts except the head
-
 class Help extends Object abstract config(UI);
 
 var privatewrite name PawnPartName;
@@ -145,8 +143,9 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	{
 		// If this part isn't legs, then adjust its position based on its scale
 		Translation.Z += (1 - PartSize) * 100;
+
 		// And adjust poistion based on scale of legs, if they are scaled.
-		if (FindArmorSize(UnitState, UnitState.kAppearance.nmLegs, eUICustomizeCat_Legs, ArmorSize))
+		if (!IsPartHeadAdjacent(Category) && FindArmorSize(UnitState, UnitState.kAppearance.nmLegs, eUICustomizeCat_Legs, ArmorSize))
 		{
 			PartSize = ArmorSize.PartSize;
 			Translation.Z -= (1 - PartSize) * 50;
@@ -164,6 +163,22 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	MeshComp.SetTranslation(Translation);
 }
 
+static private function bool IsPartHeadAdjacent(const EUICustomizeCategory Category)
+{
+	switch (Category)
+	{
+	case eUICustomizeCat_Face:
+	case eUICustomizeCat_Hairstyle:
+	case eUICustomizeCat_FacialHair:
+	case eUICustomizeCat_Helmet:
+	case eUICustomizeCat_FaceDecorationUpper:
+	case eUICustomizeCat_FaceDecorationLower:
+		return true;
+	default:
+		return false;
+	}
+	return false;
+}
 
 
 static final function bool FindArmorSize(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, out ArmorSizeStruct _ArmorSize)
