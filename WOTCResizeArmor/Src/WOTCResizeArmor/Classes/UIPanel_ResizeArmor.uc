@@ -184,6 +184,10 @@ private function OnToggleButtonHold(UIButton Button)
 
 	Button.SetDisabled(true);
 
+	List.Show();
+	ListBG.Show();
+	Button.SetPosition(defaultWidth - ToggleButtonWidth, defaultHeight + 10);
+
 	DragAndDrop = Spawn(class'UIPanel_DragAndDrop', self);
 	DragAndDrop.InitPanel();
 	DragAndDrop.SetPosition(ToggleButton.X + ToggleButton.Width / 2, ToggleButton.Y);

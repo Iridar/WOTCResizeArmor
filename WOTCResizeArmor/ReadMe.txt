@@ -17,10 +17,9 @@ This mod adds sliders that can be used to resize and reposition individual cosme
 Being able to do this opens a whole new dimension in soldier customization.
 
 [h1]LIMITATIONS[/h1]
-
-If you move or resize a body part too much, you will start noticing animation issues. This is a technical limition of the mod and nothing can be done about it. To minimize this effect, try to move and resize the parts as little as possible.
-
-The information about body part size and location is stored for each soldier individually. Resizing or moving a body part for one soldier will have no effect on other soldiers. The information is not saved to Character Pool and it cannot be moved between campaigns.
+[list][*] The head cannot be resized.
+[*] If you move or resize a body part too much, there will be animation issues. To minimize this effect, try to move and resize the parts as little as possible.
+[*] The information about body part size and location is stored for each soldier individually. Resizing or moving a body part for one soldier will have no effect on other soldiers. The information is not saved to Character Pool and it cannot be moved between campaigns.[/list]
 
 [h1]COMPATIBILITY[/h1]
 
@@ -34,12 +33,14 @@ The mod should be compatible with ALL cosmetic mods, don't even ask.
 
 The new UI panel with size and location sliders is located in the top right corner of the soldier appearance customization screen by default. There is a button you can use to hide it.
 
-In case the panel clips with UI elements from other mods, you can move it by holding the left mouse on that button to enable the drag and drop mode. Then move your mouse on top of the arrows to reposition it. Click at the center button when you're done.
+In case the panel clips with UI elements from other mods, you can move it by holding the left mouse on that button to enable the drag and drop mode. Then move your mouse on top of the arrow icons to reposition it. Click at the center button when you're done.
+
+See the video for a demonstration.
 
 [h1]CONFIGURATION[/h1]
 
 Maximum body part size and movement distance can be configured in:
-[code]..\steamapps\workshop\content\268500\2833581072\Config\XComUI.ini[/code]
+[code]..\steamapps\workshop\content\268500\2969648947\Config\XComUI.ini[/code]
 
 [h1]REQUIREMENTS[/h1]
 [list][*] [url=https://steamcommunity.com/workshop/filedetails/?id=1134256495][b]X2 WOTC Community Highlander[/b][/url][/list]

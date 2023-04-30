@@ -95,9 +95,9 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 	
 	ResizeComponent(UnitState, default.PawnPartName,					eUICustomizeCat_Face,					Pawn.Mesh);
 	// Cannot resize or translate the head, because every other part is attached to it.
-	ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kHeadMeshComponent);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kEyeMC);
-	ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kTeethMC);
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kHeadMeshComponent);
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kEyeMC);
+	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kTeethMC);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmHelmet,			eUICustomizeCat_Helmet,					Pawn.m_kHelmetMC);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmHaircut,			eUICustomizeCat_Hairstyle,				Pawn.m_kHairMC);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmBeard,			eUICustomizeCat_FacialHair,				Pawn.m_kBeardMC);
@@ -145,7 +145,7 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 
 	MeshComp.SetScale(PartSize);
 
-	if (Category != eUICustomizeCat_Legs /*&& Category != eUICustomizeCat_Face*/)
+	if (Category != eUICustomizeCat_Legs && PartName != default.PawnPartName)
 	{
 		// If this part isn't legs, then adjust its position based on its scale
 		Translation.Z += (1 - PartSize) * 100;
