@@ -121,6 +121,7 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 
 static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp)
 {
+	local UIArmory ArmoryScreen;
 	local ArmorSizeStruct ArmorSize;
 	local float	PartSize;
 	local vector Translation;
@@ -128,9 +129,20 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	if (PartName == '' || MeshComp == none)
 		return;
 
+	
 	FindArmorSize(UnitState, PartName, Category, ArmorSize);
 	PartSize = ArmorSize.PartSize;
 	Translation = ArmorSize.Translation;
+
+	// Handle SPARKSs and stuff, they need to appear smaller, but only in the armory.
+	if (PartName == default.PawnPartName && UnitState.UseLargeArmoryScale() && `HQPRES != none)
+	{
+		ArmoryScreen = UIArmory(`HQPRES.ScreenStack.GetFirstInstanceOf(class'UIArmory'));
+		if (ArmoryScreen != none)
+		{	
+			PartSize *= ArmoryScreen.LargeUnitScale;
+		}
+	}
 
 	if (!IsPartHeadAdjacent(Category) && FindArmorSize(UnitState, UnitState.kAppearance.nmHead, eUICustomizeCat_Face, ArmorSize))
 	{
