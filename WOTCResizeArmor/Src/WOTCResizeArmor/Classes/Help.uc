@@ -255,6 +255,51 @@ static final function SetPartTranslation(XComGameState_Unit UnitState, const nam
 	`GAMERULES.SubmitGameState(NewGameState);
 }
 
+static final function RemovePartSize(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category)
+{
+	local XComGameState				NewGameState;
+	local XComGameState_ResizeArmor StateObject;
+	local int i;
+
+	`AMLOG("Removing part information:" @ PartName);
+
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Remove Part Size:" @ PartName);
+	StateObject = class'XComGameState_ResizeArmor'.static.GetOrCreateAndPrep(NewGameState);
+
+	for (i = 0; i < StateObject.ArmorSizes.Length; i++)
+	{
+		if (StateObject.ArmorSizes[i].UnitID == UnitState.ObjectID &&
+			StateObject.ArmorSizes[i].PartName == PartName &&
+			StateObject.ArmorSizes[i].Category == Category)
+		{
+			StateObject.ArmorSizes.Remove(i, 1);
+			`GAMERULES.SubmitGameState(NewGameState);
+			return;
+		}
+	}
+}
+
+static final function RemoveAllPartSizesForUnit(XComGameState_Unit UnitState)
+{
+	local XComGameState				NewGameState;
+	local XComGameState_ResizeArmor StateObject;
+	local int i;
+
+	`AMLOG("Removing part information for unit:" @ UnitState.GetFullName());
+
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Remove all part sizes for:" @ UnitState.GetFullName());
+	StateObject = class'XComGameState_ResizeArmor'.static.GetOrCreateAndPrep(NewGameState);
+
+	for (i = StateObject.ArmorSizes.Length - 1; i >= 0; i--)
+	{
+		if (StateObject.ArmorSizes[i].UnitID == UnitState.ObjectID)
+		{
+			StateObject.ArmorSizes.Remove(i, 1);
+		}
+	}
+
+	`GAMERULES.SubmitGameState(NewGameState);
+}
 
 /*
 

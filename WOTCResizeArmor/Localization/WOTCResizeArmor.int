@@ -1,4 +1,7 @@
 [UIPanel_ResizeArmor]
 strSize = "Size"
-strButtonText = "Toggle Size Panel"
-strTooltip = "Click to toggle the panel's visibility. Hold to enter dragging mode. While in dragging mode, mouse over the arrow icons to reposition the panel. Click the arrow icons to reposition faster. When done, click at the icon in the center."
+strToggleButtonText = "Toggle Size Panel"
+strToggleButtonTooltip = "Click to toggle the panel's visibility. Hold to enter dragging mode. While in dragging mode, mouse over the arrow icons to reposition the panel. Click the arrow icons to reposition faster. When done, click at the icon in the center."
+
+strResetButtonText = "Reset"
+strResetButtonTooltip = "Click to reset size and position changes for this body part. Click and hold to reset size and position for all body parts for this soldier."

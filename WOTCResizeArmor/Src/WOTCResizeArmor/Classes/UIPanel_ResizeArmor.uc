@@ -12,6 +12,8 @@ var protectedwrite XComHumanPawn				UnitPawn;
 
 var private UIList		List;
 var private UIBGBox		ListBG;
+var private UIButton	ResetButton;
+var private int			ResetButtonWidth;
 var private UIButton	ToggleButton;
 var private int			ToggleButtonWidth;
 
@@ -26,8 +28,10 @@ var private config float MaxSize;
 var private config float MaxTranslation;
 
 var private localized string strSize;
-var private localized string strButtonText;
-var private localized string strTooltip;
+var private localized string strToggleButtonText;
+var private localized string strResetButtonText;
+var private localized string strToggleButtonTooltip;
+var private localized string strResetButtonTooltip;
 var bool bShowHorizontalTranslationSliders;
 
 delegate OnItemSelectedCallback(UIList _list, int itemIndex);
@@ -158,12 +162,22 @@ private function DelayedInit()
 	ToggleButton = Spawn(class'UIButton', self);
 	ToggleButton.bIsNavigable = false;
 	ToggleButton.InitButton();
-	ToggleButton.ProcessMouseEvents(OnButtonMouseEvent);
-	ToggleButton.SetText(default.strButtonText);
+	ToggleButton.ProcessMouseEvents(OnToggleButtonMouseEvent);
+	ToggleButton.SetText(default.strToggleButtonText);
 	ToggleButton.OnSizeRealized = OnButtonSizeRealized;
 	ToggleButton.fButtonHoldMaxTime = 0.5f;
 	ToggleButton.OnHoldDelegate = OnToggleButtonHold;
-	ToggleButton.SetTooltipText(strTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
+	ToggleButton.SetTooltipText(strToggleButtonTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
+
+	ResetButton = Spawn(class'UIButton', self);
+	ResetButton.bIsNavigable = false;
+	ResetButton.InitButton();
+	ResetButton.ProcessMouseEvents(OnResetButtonMouseEvent);
+	ResetButton.SetText(default.strResetButtonText);
+	ResetButton.OnSizeRealized = OnButtonSizeRealized;
+	ResetButton.fButtonHoldMaxTime = 0.5f;
+	ResetButton.OnHoldDelegate = OnResetButtonHold;
+	ResetButton.SetTooltipText(strResetButtonTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
 
 	`AMLOG("Inited panel for unit:" @ UnitState.GetFullName());
 
@@ -173,25 +187,59 @@ private function DelayedInit()
 private function OnButtonSizeRealized()
 {
 	ToggleButtonWidth = ToggleButton.Width;
+	ResetButtonWidth = ResetButton.Width;
+
 	if (List.bIsVisible)
 	{
 		ToggleButton.SetPosition(defaultWidth - ToggleButtonWidth, defaultHeight + 10);
+		ResetButton.SetPosition(defaultWidth - ResetButtonWidth - ToggleButtonWidth - 10, defaultHeight + 10);
 	}
 	else
 	{
 		ToggleButton.SetPosition(defaultWidth - ToggleButtonWidth, 0);
+		ResetButton.SetPosition(defaultWidth - ResetButtonWidth - ToggleButtonWidth - 10, 0);
 	}
+}
+
+
+private function OnResetButtonHold(UIButton Button)
+{
+	Button.bMouseDown = false;
+	class'Help'.static.RemoveAllPartSizesForUnit(UnitState);
+	ResetSlidersAndUpdatePawn();
+}
+
+private function ResetSlidersAndUpdatePawn()
+{
+	local UIMechaListItem ListItem;
+
+	ListItem = UIMechaListItem(List.GetItem(0));
+	ListItem.UpdateDataSlider(strSize, "100", (1.0f - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
+
+	if (bShowHorizontalTranslationSliders)
+	{
+	ListItem = UIMechaListItem(List.GetItem(1));
+	ListItem.UpdateDataSlider("X", "0.0", GetSliderPercentFromTranslation(0),, OnTranslationSliderChanged_X);
+
+	ListItem = UIMechaListItem(List.GetItem(2));
+	ListItem.UpdateDataSlider("Y", "0.0", GetSliderPercentFromTranslation(0),, OnTranslationSliderChanged_Y);
+	}
+	ListItem = UIMechaListItem(List.GetItem(3));
+	ListItem.UpdateDataSlider("Z", "0.0", GetSliderPercentFromTranslation(0),, OnTranslationSliderChanged_Z);
+
+	self.SetTimer(TimeBetweenPawnUpdates, false, nameof(AcquirePawnAndResize), self);
 }
 
 private function OnToggleButtonHold(UIButton Button)
 {
 	local UIPanel_DragAndDrop DragAndDrop;
 
-	Button.SetDisabled(true);
+	ToggleButton.SetDisabled(true);
+	ResetButton.SetDisabled(true);
 
 	List.Show();
 	ListBG.Show();
-	Button.SetPosition(defaultWidth - ToggleButtonWidth, defaultHeight + 10);
+	OnButtonSizeRealized();
 
 	DragAndDrop = Spawn(class'UIPanel_DragAndDrop', self);
 	DragAndDrop.InitPanel();
@@ -211,15 +259,28 @@ private function OnDragFinished()
 	class'ConfigHolder'.default.customOffsetX = X;
 	class'ConfigHolder'.default.customOffsetY = Y;
 	class'ConfigHolder'.static.CommitChanges();
+
 	ToggleButton.SetDisabled(false);
+	ResetButton.SetDisabled(false);
 	//defaultOffsetX = X;
 	//defaultOffsetY = Y;
 	//default.defaultOffsetX = X;
 	//default.defaultOffsetY = Y;
 }
 
+private function OnResetButtonMouseEvent(UIPanel Button, int cmd)
+{
+	if (UIButton(Button).IsDisabled)
+		return;
 
-private function OnButtonMouseEvent(UIPanel Button, int cmd)
+	if (cmd == class'UIUtilities_Input'.const.FXS_L_MOUSE_UP)
+	{
+		class'Help'.static.RemovePartSize(UnitState, GetPartName(), CustomizeCategory);
+		ResetSlidersAndUpdatePawn();
+	}
+}
+
+private function OnToggleButtonMouseEvent(UIPanel Button, int cmd)
 {
 	if (UIButton(Button).IsDisabled)
 		return;
@@ -230,13 +291,15 @@ private function OnButtonMouseEvent(UIPanel Button, int cmd)
 		{
 			List.Hide();
 			ListBG.Hide();
-			Button.SetPosition(defaultWidth - ToggleButtonWidth, 0);
+			ResetButton.Hide();
+			OnButtonSizeRealized();
 		}
 		else
 		{
 			List.Show();
 			ListBG.Show();
-			Button.SetPosition(defaultWidth - ToggleButtonWidth, defaultHeight + 10);
+			ResetButton.Show();
+			OnButtonSizeRealized();
 		}
 	}
 }

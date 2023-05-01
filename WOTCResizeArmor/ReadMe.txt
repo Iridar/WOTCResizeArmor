@@ -9,10 +9,13 @@ Created with Enhanced Mod Project Template v1.0
 Get news and updates here: 
 https://github.com/Iridar/EnhancedModProjectTemplate 
 
-TODO:
-Reset button
-Hold reset button: delete all entries for soldier
+Changelog:
 console command to wipe all data
+added reset button
+
+TODO:
+rescale pawn in event listener
+tooltips go off screen
 physics props are not resized
 with UCR, have to select part from the list before resizing it
 
