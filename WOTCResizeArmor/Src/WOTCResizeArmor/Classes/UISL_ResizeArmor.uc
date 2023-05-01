@@ -4,41 +4,46 @@ var private string PathToPanel;
 
 event OnInit(UIScreen Screen)
 {
-	local UICustomize_Trait		CustomizeScreen;
 	local UICustomize_Body		CustomizeBody;
 	local UIPanel_ResizeArmor	ResizeArmorPanel;
 
-	CustomizeBody = UICustomize_Body(Screen);
-	if (CustomizeBody != none)
+	
+	`LOG(Screen.Class.Name,, 'IRITEST');
+	// Spawn the panel for resizing the entire pawn.
+	if (Screen.IsA('UICustomize_Body') || Screen.IsA('UICustomize_SparkBody'))
 	{
 		FindAndRemovePanel();
 		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizePawn', `HQPRES.m_kAvengerHUD);
-		ResizeArmorPanel.CustomizeScreen = CustomizeBody;
+		ResizeArmorPanel.CustomizeScreen = UICustomize(Screen);
 		ResizeArmorPanel.InitPanel();
 		PathToPanel = PathName(ResizeArmorPanel);
 		return;
 	}
 	
-
-	CustomizeScreen = UICustomize_Trait(Screen);
-	if (CustomizeScreen == none)
-		return;
-
-	if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_Body'))
+	// For individual body parts.
+	if (Screen.IsA('UICustomize_Trait') || Screen.IsA('uc_ui_screens_BodyPartList') || Screen.IsA('uc_ui_screens_SparkPropsPartList'))
 	{
-		FindAndRemovePanel();
-		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeArmor', `HQPRES.m_kAvengerHUD);
-	}
-	else if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_Head'))
-	{
-		FindAndRemovePanel();
-		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeHead', `HQPRES.m_kAvengerHUD);
-	}
+		if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_Body'))
+		{
+			FindAndRemovePanel();
+			ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeArmor', `HQPRES.m_kAvengerHUD);
+		}
+		else if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_Head'))
+		{
+			FindAndRemovePanel();
+			ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeHead', `HQPRES.m_kAvengerHUD);
+		}
+		else if (Screen.Movie.Pres.ScreenStack.HasInstanceOf(class'UICustomize_SparkBody'))
+		{
+			FindAndRemovePanel();
+			ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizeArmor', `HQPRES.m_kAvengerHUD);
+		}
 
-	`AMLOG("Spawned panel on screen:" @ Screen.Class.Name);
-	ResizeArmorPanel.CustomizeScreen = CustomizeScreen;
-	ResizeArmorPanel.InitPanel();
-	PathToPanel = PathName(ResizeArmorPanel);
+		`AMLOG("Spawned panel on screen:" @ Screen.Class.Name);
+		ResizeArmorPanel.CustomizeScreen = UICustomize(Screen);
+		ResizeArmorPanel.InitPanel();
+		PathToPanel = PathName(ResizeArmorPanel);
+	}
 }
 event OnReceiveFocus(UIScreen Screen)
 {	

@@ -3,6 +3,7 @@ class UIPanel_ResizeArmor extends UIPanel config(UI);
 var UICustomize CustomizeScreen;
 
 var private UICustomize_Body					CustomizeBody;
+var private UICustomize_SparkBody				CustomizeSparkBody;					
 var private XComGameState_Unit					UnitState;
 var private delegate<OnItemSelectedCallback>	OnSelectionChangedOrig;
 
@@ -63,6 +64,7 @@ private function DelayedInit()
 
 	if (!GetParentCustomizeScreen())
 	{
+		`AMLOG("WARNING :: Failed to get parent Customize Screen, exiting.");
 		self.Remove(); // Commit sudoku 
 		return;
 	}
@@ -72,12 +74,14 @@ private function DelayedInit()
 	CustomizeCategory = GetCustomizeCategory();
 	if (CustomizeCategory == eUICustomizeCat_FirstName)
 	{
+		`AMLOG("Customize Category" @ CustomizeCategory @ "is not supported, exiting.");
 		self.Remove();
 		return;
 	}
 	UnitState = CustomizeScreen.GetUnit();
 	if (UnitState == none)
 	{
+		`AMLOG("WARNING :: Failed to get Unit State from Customize Screen, exiting.");
 		self.Remove();
 		return;
 	}
@@ -85,6 +89,7 @@ private function DelayedInit()
 	UnitPawn = XComHumanPawn(CustomizeScreen.CustomizeManager.ActorPawn);
 	if (UnitPawn == none)
 	{
+		`AMLOG("WARNING :: Failed to get Unit Pawn from Customize Screen, exiting.");
 		self.Remove();
 		return;
 	}
@@ -239,7 +244,12 @@ private function OnButtonMouseEvent(UIPanel Button, int cmd)
 protected function bool GetParentCustomizeScreen()
 {
 	CustomizeBody = UICustomize_Body(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_Body'));
-	return CustomizeBody != none;
+	if (CustomizeBody == none)
+	{
+		CustomizeSparkBody = UICustomize_SparkBody(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_SparkBody'));
+	}
+
+	return CustomizeBody != none || CustomizeSparkBody != none;
 }
 
 private function int GetSliderPercentFromTranslation(const float Translation)
@@ -399,41 +409,57 @@ private function AcquirePawnAndResize()
 
 protected function EUICustomizeCategory GetCustomizeCategory()
 {
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeTorso))
-		return eUICustomizeCat_Torso;
+	if (CustomizeBody != none)
+	{
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeTorso))
+			return eUICustomizeCat_Torso;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeArms))
-		return eUICustomizeCat_Arms;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeArms))
+			return eUICustomizeCat_Arms;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLegs))
-		return eUICustomizeCat_Legs;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLegs))
+			return eUICustomizeCat_Legs;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLeftArm))
-		return eUICustomizeCat_LeftArm;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLeftArm))
+			return eUICustomizeCat_LeftArm;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeRightArm))
-		return eUICustomizeCat_RightArm;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeRightArm))
+			return eUICustomizeCat_RightArm;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLeftArmDeco))
-		return eUICustomizeCat_LeftArmDeco;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLeftArmDeco))
+			return eUICustomizeCat_LeftArmDeco;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeRightArmDeco))
-		return eUICustomizeCat_RightArmDeco;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeRightArmDeco))
+			return eUICustomizeCat_RightArmDeco;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLeftForearm))
-		return eUICustomizeCat_LeftForearm;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeLeftForearm))
+			return eUICustomizeCat_LeftForearm;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeRightForearm))
-		return eUICustomizeCat_RightForearm;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeRightForearm))
+			return eUICustomizeCat_RightForearm;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeThighs))
-		return eUICustomizeCat_Thighs;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeThighs))
+			return eUICustomizeCat_Thighs;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeShins))
-		return eUICustomizeCat_Shins;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeShins))
+			return eUICustomizeCat_Shins;
 
-	if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeTorsoDeco))
-		return eUICustomizeCat_TorsoDeco;
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeBody.ChangeTorsoDeco))
+			return eUICustomizeCat_TorsoDeco;
+	}
+	else
+	{
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeSparkBody.ChangeTorso))
+			return eUICustomizeCat_Torso;
+
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeSparkBody.ChangeArms))
+			return eUICustomizeCat_Arms;
+
+		if (string(CustomizeScreen.List.OnSelectionChanged) == string(CustomizeSparkBody.ChangeLegs))
+			return eUICustomizeCat_Legs;
+	}
+
+	`AMLOG(string(CustomizeScreen.List.OnSelectionChanged) @ "unknown change body part delegate.");
 
 	return eUICustomizeCat_FirstName;
 }
