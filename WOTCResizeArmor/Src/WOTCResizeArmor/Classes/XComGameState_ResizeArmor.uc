@@ -42,7 +42,14 @@ static final function XComGameState_ResizeArmor GetOrCreate(optional XComGameSta
 	
 	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Creating XComGameState_ResizeArmor");
 	StateObject = XComGameState_ResizeArmor(NewGameState.CreateNewStateObject(class'XComGameState_ResizeArmor'));
-	`XCOMHISTORY.AddGameStateToHistory(NewGameState);
+	if (`GAMERULES != none)
+	{
+		`GAMERULES.SubmitGameState(NewGameState);
+	}
+	else
+	{
+		`XCOMHISTORY.AddGameStateToHistory(NewGameState);
+	}
 	
 	return StateObject;
 }
