@@ -31,6 +31,9 @@
     <Content Include="Src\WOTCResizeArmor\Classes\ConfigHolder.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\WOTCResizeArmor\Classes\UCArbitraryRead.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\WOTCResizeArmor\Classes\UIPanel_DragAndDrop.uc">
       <SubType>Content</SubType>
     </Content>

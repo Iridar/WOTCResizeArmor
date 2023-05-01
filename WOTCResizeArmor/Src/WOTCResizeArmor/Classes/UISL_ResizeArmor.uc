@@ -4,11 +4,9 @@ var private string PathToPanel;
 
 event OnInit(UIScreen Screen)
 {
-	local UICustomize_Body		CustomizeBody;
 	local UIPanel_ResizeArmor	ResizeArmorPanel;
 
-	
-	`LOG(Screen.Class.Name,, 'IRITEST');
+	//`LOG(Screen.Class.Name,, 'IRITEST');
 	// Spawn the panel for resizing the entire pawn.
 	if (Screen.IsA('UICustomize_Body') || Screen.IsA('UICustomize_SparkBody'))
 	{
