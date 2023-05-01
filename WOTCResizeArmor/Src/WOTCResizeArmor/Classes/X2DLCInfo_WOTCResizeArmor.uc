@@ -1,5 +1,19 @@
 class X2DLCInfo_WOTCResizeArmor extends X2DownloadableContentInfo;
 
+exec function ResizeArmorWipe()
+{
+	local XComGameState_ResizeArmor ResizeArmor;
+	local XComGameState				NewGameState;
+
+	ResizeArmor = class'XComGameState_ResizeArmor'.static.Get();
+	if (ResizeArmor != none)
+	{
+		NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Removing XComGameState_ResizeArmor");
+		NewGameState.RemoveStateObject(ResizeArmor.ObjectID);
+		`GAMERULES.SubmitGameState(NewGameState);
+	}
+}
+
 //exec function SetOffset(int X, int Y)
 //{	
 //	class'UIPanel_ResizeArmor'.default.defaultOffsetX = X;
