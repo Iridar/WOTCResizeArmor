@@ -1,18 +1,42 @@
-class UISL_ResizeArmor extends UIScreenListener;
+class UISL_ResizeArmor extends UIScreenListener config(UI);
 
 var private string PathToPanel;
 
+var private config bool bAddResizeBodyPanelToCustomizeMainMenu;
+
 event OnInit(UIScreen Screen)
 {
+	local UICustomize			CustomizeScreen;
 	local UIPanel_ResizeArmor	ResizeArmorPanel;
+	local XComGameState_Unit	UnitState;
+	local X2CharacterTemplate	CharTemplate;
+	local bool					bAddResizePawnPanel;
+
+	CustomizeScreen = UICustomize(Screen);
+	if (CustomizeScreen == none)
+		return;
+
+	CharTemplate.UICustomizationMenuClass = class'UICustomize_SparkMenu';
+	if (bAddResizeBodyPanelToCustomizeMainMenu)
+	{
+		UnitState = CustomizeScreen.GetUnit();
+		if (UnitState != none)
+		{
+			CharTemplate = UnitState.GetMyTemplate();
+			if (CharTemplate != none)
+			{
+				bAddResizePawnPanel = CharTemplate.UICustomizationMenuClass == CustomizeScreen.Class;
+			}
+		}
+	}
 
 	//`LOG(Screen.Class.Name,, 'IRITEST');
 	// Spawn the panel for resizing the entire pawn.
-	if (Screen.IsA('UICustomize_Body') || Screen.IsA('UICustomize_SparkBody'))
+	if (bAddResizePawnPanel || Screen.IsA('UICustomize_Body') || Screen.IsA('UICustomize_SparkBody'))
 	{
 		FindAndRemovePanel();
 		ResizeArmorPanel = Screen.Spawn(class'UIPanel_ResizePawn', `HQPRES.m_kAvengerHUD);
-		ResizeArmorPanel.CustomizeScreen = UICustomize(Screen);
+		ResizeArmorPanel.CustomizeScreen = CustomizeScreen;
 		ResizeArmorPanel.InitPanel();
 		PathToPanel = PathName(ResizeArmorPanel);
 		return;
@@ -38,7 +62,7 @@ event OnInit(UIScreen Screen)
 		}
 
 		`AMLOG("Spawned panel on screen:" @ Screen.Class.Name);
-		ResizeArmorPanel.CustomizeScreen = UICustomize(Screen);
+		ResizeArmorPanel.CustomizeScreen = CustomizeScreen;
 		ResizeArmorPanel.InitPanel();
 		PathToPanel = PathName(ResizeArmorPanel);
 	}
