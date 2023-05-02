@@ -92,7 +92,8 @@ static final function bool GetPartSize(XComGameState_Unit UnitState, const name 
 
 static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
-	
+	//local XComPawnPhysicsProp Prop;
+
 	ResizeComponent(UnitState, default.PawnPartName,					eUICustomizeCat_Face,					Pawn.Mesh);
 	// Cannot resize or translate the head, because every other part is attached to it.
 	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kHeadMeshComponent);
@@ -117,6 +118,13 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 	ResizeComponent(UnitState, UnitState.kAppearance.nmThighs,			eUICustomizeCat_Thighs,			Pawn.m_kThighsMC);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmShins,			eUICustomizeCat_Shins,			Pawn.m_kShinsMC);
 	ResizeComponent(UnitState, UnitState.kAppearance.nmTorsoDeco,		eUICustomizeCat_TorsoDeco,		Pawn.m_kTorsoDecoMC);
+
+	// TODO: Try recreating the physics prop instead
+	//foreach Pawn.m_aPhysicsProps(Prop)
+	//{
+	//	Prop.SkeletalMeshComponent.SetScale(3.0f);
+	//}
+	
 }
 
 static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp)

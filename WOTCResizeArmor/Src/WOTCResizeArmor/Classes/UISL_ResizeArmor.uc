@@ -16,7 +16,6 @@ event OnInit(UIScreen Screen)
 	if (CustomizeScreen == none)
 		return;
 
-	CharTemplate.UICustomizationMenuClass = class'UICustomize_SparkMenu';
 	if (bAddResizeBodyPanelToCustomizeMainMenu)
 	{
 		UnitState = CustomizeScreen.GetUnit();
