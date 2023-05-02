@@ -21,6 +21,9 @@
     <Content Include="Config\XComUI.ini">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Localization\WOTCResizeArmor.rus">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="ReadMe.txt" />
     <Content Include="ModPreview.jpg" />
     <Content Include="Config\Base\XComEditor.ini" />
