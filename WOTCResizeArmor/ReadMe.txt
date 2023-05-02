@@ -10,15 +10,17 @@ Get news and updates here:
 https://github.com/Iridar/EnhancedModProjectTemplate 
 
 Changelog:
-console command to wipe all data
-added reset button
+Added a "ResizeArmorWipe" console command to wipe all data stored by the mod in the save file.
+Added a reset button.
+Added Russian translation.
+The panel to customize the soldier size will now show in the main customization menu as well. Useful for soldiers that do not have a customizable body, i.e. Playable Aliens. This feature can be disabled in config.
+Tooltips should no longer go off screen if the panel is moved too far down.
+Improved the limit on how far the panel will allow itself to be moved downwards.
+
 
 TODO:
-rescale pawn in event listener
-tooltips go off screen
 physics props are not resized
 with UCR, have to select part from the list before resizing it
-
 
 [WOTC] Iridar's Resizable Armor
 

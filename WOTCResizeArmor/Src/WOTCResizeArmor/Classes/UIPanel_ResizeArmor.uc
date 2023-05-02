@@ -167,8 +167,7 @@ private function DelayedInit()
 	ToggleButton.OnSizeRealized = OnButtonSizeRealized;
 	ToggleButton.fButtonHoldMaxTime = 0.5f;
 	ToggleButton.OnHoldDelegate = OnToggleButtonHold;
-	ToggleButton.SetTooltipText(strToggleButtonTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
-
+	
 	ResetButton = Spawn(class'UIButton', self);
 	ResetButton.bIsNavigable = false;
 	ResetButton.InitButton();
@@ -177,11 +176,27 @@ private function DelayedInit()
 	ResetButton.OnSizeRealized = OnButtonSizeRealized;
 	ResetButton.fButtonHoldMaxTime = 0.5f;
 	ResetButton.OnHoldDelegate = OnResetButtonHold;
-	ResetButton.SetTooltipText(strResetButtonTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
 
+	UpdateButtonTooltips();
+	
 	`AMLOG("Inited panel for unit:" @ UnitState.GetFullName());
 
 	Show();
+}
+
+private function UpdateButtonTooltips()
+{
+	// Shift tooltips upwards if the panel is in the lower half of the screen
+	if (Y > 1080 / 2)
+	{
+		ToggleButton.SetTooltipText(strToggleButtonTooltip,, -defaultWidth / 2, -250, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
+		ResetButton.SetTooltipText(strResetButtonTooltip,, -defaultWidth / 2, -250, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
+	}
+	else
+	{
+		ToggleButton.SetTooltipText(strToggleButtonTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
+		ResetButton.SetTooltipText(strResetButtonTooltip,, -defaultWidth / 2,, true /*bRelativeLocation*/,, false /*bFollowMouse*/, 0.25f);
+	}
 }
 
 private function OnButtonSizeRealized()
@@ -246,8 +261,15 @@ private function OnToggleButtonHold(UIButton Button)
 	DragAndDrop.SetPosition(ToggleButton.X + ToggleButton.Width / 2, ToggleButton.Y);
 	DragAndDrop.OnDragFinishedFn = OnDragFinished;
 	DragAndDrop.iClampLeft = 0;
-	DragAndDrop.iClampRight = 1920 - ListBG.Width;
-	DragAndDrop.iClampBottom = 1080 - ListBG.Height - ToggleButton.Height - 10;
+	DragAndDrop.iClampRight = 1920 - ListBG.Width - 10;
+	if (bShowHorizontalTranslationSliders)
+	{
+		DragAndDrop.iClampBottom = 1080 - ListBG.Height - ToggleButton.Height - 10;
+	}
+	else
+	{
+		DragAndDrop.iClampBottom = 1080 - ListBG.Height * 2 - ToggleButton.Height - 10;
+	}
 	DragAndDrop.iClampTop = 0;
 
 	Button.bMouseDown = false;
@@ -262,6 +284,7 @@ private function OnDragFinished()
 
 	ToggleButton.SetDisabled(false);
 	ResetButton.SetDisabled(false);
+	UpdateButtonTooltips();
 	//defaultOffsetX = X;
 	//defaultOffsetY = Y;
 	//default.defaultOffsetX = X;
