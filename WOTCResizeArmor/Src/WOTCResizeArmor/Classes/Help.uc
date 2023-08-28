@@ -94,7 +94,17 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 {
 	//local XComPawnPhysicsProp Prop;
 
-	ResizeComponent(UnitState, default.PawnPartName,					eUICustomizeCat_Face,					Pawn.Mesh);
+	if (!UnitState.IsSoldier())
+		return;
+
+	local XComUnitPawn	OriginalPawn;
+	local float			OriginalScale;
+
+	// Not ideal, might theoretically return a pawn archetype different from the one actually used by this pawn. 
+	OriginalPawn = XComUnitPawn(`CONTENT.RequestGameArchetype(UnitState.GetMyTemplate().GetPawnArchetypeString(UnitState)));
+	OriginalScale = OriginalPawn != none ? OriginalPawn.Mesh.Scale : 1.0f;
+
+	ResizeComponent(UnitState, default.PawnPartName,					eUICustomizeCat_Face,					Pawn.Mesh, OriginalScale);
 	// Cannot resize or translate the head, because every other part is attached to it.
 	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kHeadMeshComponent);
 	//ResizeComponent(UnitState, UnitState.kAppearance.nmHead,			eUICustomizeCat_Face,					Pawn.m_kEyeMC);
@@ -127,7 +137,7 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 	
 }
 
-static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp)
+static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp, optional float OriginalScale = 1.0f)
 {
 	local UIArmory ArmoryScreen;
 	local ArmorSizeStruct ArmorSize;
@@ -158,12 +168,13 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 		Translation += ArmorSize.Translation;
 	}
 
+	PartSize = OriginalScale * PartSize;
+
 	if (MeshComp.Scale != PartSize)
 	{
-		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Scale @ "->" @ PartSize);
+		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Scale @ "->" @ PartSize @ "original scale:" @ OriginalScale);
+		MeshComp.SetScale(PartSize);
 	}
-
-	MeshComp.SetScale(PartSize);
 
 	if (Category != eUICustomizeCat_Legs && PartName != default.PawnPartName)
 	{
@@ -182,11 +193,11 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 	{
 		Translation.Z -= 64;
 	}
-	if (MeshComp.Translation != Translation)
+	if (MeshComp.Translation != Translation && MeshComp.Translation.Z == 0)
 	{
 		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Translation.X @ MeshComp.Translation.Y @ MeshComp.Translation.Z @ "->" @ Translation.X @ Translation.Y @ Translation.Z);
+		MeshComp.SetTranslation(Translation);
 	}
-	MeshComp.SetTranslation(Translation);
 }
 
 static private function bool IsPartHeadAdjacent(const EUICustomizeCategory Category)
