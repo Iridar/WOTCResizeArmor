@@ -93,12 +93,11 @@ static final function bool GetPartSize(XComGameState_Unit UnitState, const name 
 static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
 	//local XComPawnPhysicsProp Prop;
+	local XComUnitPawn	OriginalPawn;
+	local float			OriginalScale;
 
 	if (!UnitState.IsSoldier())
 		return;
-
-	local XComUnitPawn	OriginalPawn;
-	local float			OriginalScale;
 
 	// Not ideal, might theoretically return a pawn archetype different from the one actually used by this pawn. 
 	OriginalPawn = XComUnitPawn(`CONTENT.RequestGameArchetype(UnitState.GetMyTemplate().GetPawnArchetypeString(UnitState)));
@@ -189,11 +188,12 @@ static private function ResizeComponent(XComGameState_Unit UnitState, const name
 		//}
 	}
 
-	if (Category == eUICustomizeCat_Face)
+	// This isn't ideal, as I might end up modifying position of a unit that already had a non-standard position for whatever reason
+	if (Category == eUICustomizeCat_Face /*&& MeshComp.Translation.Z == 0*/)
 	{
 		Translation.Z -= 64;
 	}
-	if (MeshComp.Translation != Translation && MeshComp.Translation.Z == 0)
+	if (MeshComp.Translation != Translation)
 	{
 		`AMLOG(UnitState.GetFullName() @ PartName @ MeshComp.Translation.X @ MeshComp.Translation.Y @ MeshComp.Translation.Z @ "->" @ Translation.X @ Translation.Y @ Translation.Z);
 		MeshComp.SetTranslation(Translation);
