@@ -329,7 +329,14 @@ private function OnToggleButtonMouseEvent(UIPanel Button, int cmd)
 
 protected function bool GetParentCustomizeScreen()
 {
+	if (CustomizeScreen.IsA('PD_UICustomize_Trait'))
+		return true;
+
 	CustomizeBody = UICustomize_Body(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_Body'));
+	if (CustomizeBody == none)
+	{
+		CustomizeSparkBody = UICustomize_SparkBody(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_SparkBody'));
+	}
 	if (CustomizeBody == none)
 	{
 		CustomizeSparkBody = UICustomize_SparkBody(self.Movie.Pres.ScreenStack.GetFirstInstanceOf(class'UICustomize_SparkBody'));
@@ -496,6 +503,50 @@ private function AcquirePawnAndResize()
 protected function EUICustomizeCategory GetCustomizeCategory()
 {
 	local int UCRBodyType;
+
+	if (CustomizeScreen.IsA('PD_UICustomize_Trait'))
+	{
+		switch (CustomizeScreen.MCName)
+		{
+		case 'Helmet':
+			return eUICustomizeCat_Helmet;
+		case 'Hair':
+			return eUICustomizeCat_Hairstyle;
+		case 'UpperFace':
+			return eUICustomizeCat_FaceDecorationUpper;
+		case 'LowerFace':
+			return eUICustomizeCat_FaceDecorationLower;
+		case 'FacialHair':
+			return eUICustomizeCat_FacialHair;
+		case 'Torso':
+			return eUICustomizeCat_Torso;
+		case 'Arms':
+			return eUICustomizeCat_Arms;
+		case 'Legs':
+			return eUICustomizeCat_Legs;
+		case 'TorsoDeco':
+			return eUICustomizeCat_TorsoDeco;
+		case 'LeftArm':
+			return eUICustomizeCat_LeftArm;
+		case 'LeftForearm':
+			return eUICustomizeCat_LeftForearm;
+		case 'RightArm':
+			return eUICustomizeCat_RightArm;
+		case 'RightForearm':
+			return eUICustomizeCat_RightForearm;
+		case 'Thighs':
+			return eUICustomizeCat_Thighs;
+		case 'Shins':
+			return eUICustomizeCat_Shins;
+		case 'LeftArmDeco':
+			return eUICustomizeCat_LeftArmDeco;
+		case 'RightArmDeco':
+			return eUICustomizeCat_LeftArmDeco;
+		case 'Face':
+		default:
+				return eUICustomizeCat_FirstName;
+		}
+	}
 
 	if (CustomizeScreen.IsA('uc_ui_screens_BodyPartList') || CustomizeScreen.IsA('uc_ui_screens_SparkPropsPartList'))
 	{

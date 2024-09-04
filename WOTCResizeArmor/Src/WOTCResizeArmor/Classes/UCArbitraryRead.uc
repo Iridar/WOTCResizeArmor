@@ -13,6 +13,7 @@ struct ExposedName {
 	var int Index, Suffix;
 };
 
+var name NameVar;
 var int IntVar; // UOBJECT_PROPERTIES_SIZE + 0
 var byte ByteVar; // UOBJECT_PROPERTIES_SIZE + 4
 
