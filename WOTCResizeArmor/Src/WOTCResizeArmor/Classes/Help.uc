@@ -296,6 +296,8 @@ static final function RemovePartSize(XComGameState_Unit UnitState, const name Pa
 			return;
 		}
 	}
+
+	`XCOMHISTORY.CleanupPendingGameState(NewGameState);
 }
 
 static final function RemoveAllPartSizesForUnit(XComGameState_Unit UnitState)
