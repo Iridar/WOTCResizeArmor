@@ -13,12 +13,19 @@
     <Folder Include="Config\" />
     <Folder Include="Config\Base\" />
     <Folder Include="Localization\" />
+    <Folder Include="ContentForCook" />
     <Folder Include="Src\" />
     <Folder Include="Src\WOTCResizeArmor\" />
     <Folder Include="Src\WOTCResizeArmor\Classes\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\XComUI.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ContentForCook\IRIResizableArmor.upk">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ContentOptions.json">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Localization\WOTCResizeArmor.rus">

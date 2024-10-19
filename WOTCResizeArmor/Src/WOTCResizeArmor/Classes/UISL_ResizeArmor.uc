@@ -16,7 +16,7 @@ event OnInit(UIScreen Screen)
 	local bool					bPDCustomizeHead;
 	local bool					bPDCustomizeBody;
 
-	`AMLOG("Init Screen class:" @ Screen.Class.Name @ "MC Name:" @ Screen.MCName);
+	//`AMLOG("Init Screen class:" @ Screen.Class.Name @ "MC Name:" @ Screen.MCName);
 
 	CustomizeScreen = UICustomize(Screen);
 	if (CustomizeScreen == none)
@@ -124,7 +124,7 @@ event OnRemoved(UIScreen Screen)
 {
 	local UIPanel_ResizeArmor ResizeArmorPanel;
 
-	`AMLOG(Screen.Class.Name @ string(Screen));
+	//`AMLOG(Screen.Class.Name @ string(Screen));
 
 	ResizeArmorPanel = UIPanel_ResizeArmor(FindObject(PathToPanel, class'UIPanel_ResizeArmor'));
 	if (ResizeArmorPanel != none)
@@ -139,7 +139,7 @@ event OnRemoved(UIScreen Screen)
 }
 event OnLoseFocus(UIScreen Screen)
 {	
-	`AMLOG(Screen.Class.Name @ string(Screen));
+	//`AMLOG(Screen.Class.Name @ string(Screen));
 	OnRemoved(Screen);
 }
 /*
