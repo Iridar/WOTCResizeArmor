@@ -128,8 +128,8 @@ static function UnitPawnPostInitAnimTree(XComGameState_Unit UnitState, XComUnitP
 
 	`AMLOG("Patching Resizable Armor AnimTree for:" @ Pawn.Class.Name);
 
-	//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_ResizableArmor", class'AnimTree'));
-	AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_Original", class'AnimTree'));
+	AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_ResizableArmor", class'AnimTree'));
+	//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_Original", class'AnimTree'));
 	//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_XSoldier", class'AnimTree'));
 	if (AnimTreeTemplate == none)
 	{
