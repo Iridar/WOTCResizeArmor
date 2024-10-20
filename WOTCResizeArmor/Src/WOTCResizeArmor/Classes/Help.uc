@@ -134,7 +134,47 @@ static final function ResizeArmor(XComGameState_Unit UnitState, XComUnitPawn Paw
 	//	Prop.SkeletalMeshComponent.SetScale(3.0f);
 	//}
 	
+	ScaleBoneController(UnitState, Pawn, 'HeadScale');
+	ScaleBoneController(UnitState, Pawn, 'NeckScale');
+	ScaleBoneController(UnitState, Pawn, 'RibcageScale');
+	ScaleBoneController(UnitState, Pawn, 'RShoulderScale');
+	ScaleBoneController(UnitState, Pawn, 'LShoulderScale');
+	ScaleBoneController(UnitState, Pawn, 'RArmScale');
+	ScaleBoneController(UnitState, Pawn, 'LArmScale');
+	ScaleBoneController(UnitState, Pawn, 'RForearmScale');
+	ScaleBoneController(UnitState, Pawn, 'LForearmScale');
+	ScaleBoneController(UnitState, Pawn, 'RHandScale');
+	ScaleBoneController(UnitState, Pawn, 'LHandScale');
+	ScaleBoneController(UnitState, Pawn, 'SpineScale');
+	ScaleBoneController(UnitState, Pawn, 'PelvisScale');
+	ScaleBoneController(UnitState, Pawn, 'RLegScale');
+	ScaleBoneController(UnitState, Pawn, 'LLegScale');
+	ScaleBoneController(UnitState, Pawn, 'RShinScale');
+	ScaleBoneController(UnitState, Pawn, 'LShinScale');
 }
+
+// ======================================================
+
+static private function ScaleBoneController(XComGameState_Unit UnitState, XComUnitPawn Pawn, const name ControllerName)
+{
+	local SkelControlBase SkelControl;
+	local float fNewScale;
+
+	GetPartSize(UnitState, ControllerName, eUICustomizeCat_DEV1, fNewScale);
+
+	SkelControl = Pawn.Mesh.FindSkelControl(ControllerName);
+	if (SkelControl != none)
+	{
+		SkelControl.BoneScale = fNewScale;
+		`AMLOG("Found Hands controller, new bone scale:" @ SkelControl.BoneScale);
+	}
+	else
+	{
+		`AMLOG("Failed to find bone controller:" @ ControllerName);
+	}
+}
+
+// ------------------------------------------------------
 
 static private function ResizeComponent(XComGameState_Unit UnitState, const name PartName, const EUICustomizeCategory Category, SkeletalMeshComponent MeshComp, optional float OriginalScale = 1.0f)
 {

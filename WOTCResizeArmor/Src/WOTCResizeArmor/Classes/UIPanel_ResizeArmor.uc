@@ -156,6 +156,33 @@ private function DelayedInit()
 	ListItem.InitListItem();
 	ListItem.UpdateDataSlider("Z", TruncateFloat(Translation.Z), GetSliderPercentFromTranslation(Translation.Z),, OnTranslationSliderChanged_Z);
 
+	// ==========================================================
+	
+	SpawnBoneScaleSlider('HeadScale');
+	SpawnBoneScaleSlider('NeckScale');
+	SpawnBoneScaleSlider('RibcageScale');
+	SpawnBoneScaleSlider('SpineScale');
+	SpawnBoneScaleSlider('PelvisScale');
+
+	SpawnBoneScaleSlider('RShoulderScale');
+	SpawnBoneScaleSlider('RArmScale');
+	SpawnBoneScaleSlider('RForearmScale');
+	SpawnBoneScaleSlider('RHandScale');
+
+	SpawnBoneScaleSlider('LShoulderScale');
+	SpawnBoneScaleSlider('LArmScale');
+	SpawnBoneScaleSlider('LForearmScale');
+	SpawnBoneScaleSlider('LHandScale');
+
+	SpawnBoneScaleSlider('RLegScale');
+	SpawnBoneScaleSlider('RShinScale');
+
+	SpawnBoneScaleSlider('LLegScale');
+	SpawnBoneScaleSlider('LShinScale');
+
+	// ----------------------------------------------------------
+
+
 	List.RealizeItems();
 	List.RealizeList();
 
@@ -183,6 +210,39 @@ private function DelayedInit()
 
 	Show();
 }
+
+// ==========================================================
+
+private function SpawnBoneScaleSlider(const name SetMCName)
+{
+	local UIMechaListItem ListItem;
+	local float PartSize;
+
+	ListItem = Spawn(class'UIMechaListItem', List.itemContainer);
+	ListItem.bAnimateOnInit = false;
+	ListItem.InitListItem(SetMCName);
+	class'Help'.static.GetPartSize(UnitState, ListItem.MCName, eUICustomizeCat_DEV1, PartSize);
+	ListItem.UpdateDataSlider(string(ListItem.MCName), TruncateFloat(PartSize), GetSliderPercentFromTranslation(PartSize),, OnSizeSliderChanged_BoneScale);
+}
+
+private function OnSizeSliderChanged_BoneScale(UISlider sliderControl)
+{
+	local name PartName;
+	local float Scale;
+
+	//Scale = MinSize + (MaxSize - MinSize) * sliderControl.percent / 100.0f;
+	Scale = sliderControl.percent * 2 / 100.0f;
+
+	sliderControl.SetText(TruncateFloat(sliderControl.percent / 50));
+
+	PartName = sliderControl.ParentPanel.MCName;
+
+	class'Help'.static.SetPartSize(UnitState, PartName, eUICustomizeCat_DEV1, Scale);
+
+	class'Help'.static.ResizeArmor(UnitState, UnitPawn);
+}
+
+// ----------------------------------------------------------
 
 private function UpdateButtonTooltips()
 {
@@ -227,6 +287,7 @@ private function OnResetButtonHold(UIButton Button)
 private function ResetSlidersAndUpdatePawn()
 {
 	local UIMechaListItem ListItem;
+	local int i;
 
 	ListItem = UIMechaListItem(List.GetItem(0));
 	ListItem.UpdateDataSlider(strSize, "100", (1.0f - MinSize) * 100.0f / (MaxSize - MinSize),, OnSizeSliderChanged);
@@ -241,6 +302,20 @@ private function ResetSlidersAndUpdatePawn()
 	}
 	ListItem = UIMechaListItem(List.GetItem(3));
 	ListItem.UpdateDataSlider("Z", "0.0", GetSliderPercentFromTranslation(0),, OnTranslationSliderChanged_Z);
+
+
+	// =======================================================
+	
+	for (i = 4; i < List.ItemCount; i++)
+	{
+		ListItem = UIMechaListItem(List.GetItem(i));
+		if (ListItem == none)
+			break;
+
+		ListItem.UpdateDataSlider(ListItem.Desc.htmlText, "1.0", 50,, OnSizeSliderChanged_BoneScale);
+	}
+
+	// -------------------------------------------------------
 
 	self.SetTimer(TimeBetweenPawnUpdates, false, nameof(AcquirePawnAndResize), self);
 }
@@ -788,3 +863,7 @@ defaultproperties
 {
 	bShowHorizontalTranslationSliders = true
 }
+
+
+
+

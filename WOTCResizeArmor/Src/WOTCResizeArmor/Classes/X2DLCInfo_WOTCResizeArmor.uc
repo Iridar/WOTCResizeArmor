@@ -4,15 +4,6 @@ class X2DLCInfo_WOTCResizeArmor extends X2DownloadableContentInfo;
 // 1. Proportions are adjusted by playing an additive animation that alters the skeleton structure by making some of the bones longer or shorter or just moving them. This can be used to e.g. make shoulders wider.
 // 2. At the same time, the mesh of cosmetics is adjusted by applying a morph to it.
 
-var config float BoneScale;
-var config bool bTogglePatching;
-
-exec function SetBoneScale(float NewBoneScale)
-{
-	default.BoneScale = NewBoneScale;
-	default.bTogglePatching = true;
-}
-
 exec function ResizeArmorWipe()
 {
 	local XComGameState_ResizeArmor ResizeArmor;
@@ -56,88 +47,47 @@ static function string DLCAppendSockets(XComUnitPawn Pawn)
 }
 static function UpdateAnimations(out array<AnimSet> CustomAnimSets, XComGameState_Unit UnitState, XComUnitPawn Pawn)
 {
-	local SkelControlBase SkelControl;
-
 	if (XComHumanPawn(Pawn) == none || UnitState == none)
 		return;
 
-// TODO: DEBUG ONLY
-// class'Help'.static.ResizeArmor(UnitState, Pawn);
-
-	SkelControl = Pawn.Mesh.FindSkelControl('HandsScale');
-	if (SkelControl != none)
-	{
-		
-		SkelControl.BoneScale = 1 + default.BoneScale;
-		`AMLOG("Found Hands controller, new bone scale:" @ SkelControl.BoneScale);
-	}
-	else
-	{
-		`AMLOG("Failed to find Hands controller");
-	}
-
-	SkelControl = Pawn.Mesh.FindSkelControl('LegsScale');
-	if (SkelControl != none)
-	{
-		
-		SkelControl.BoneScale = 1 + default.BoneScale;
-		`AMLOG("Found Legs controller, new bone scale:" @ SkelControl.BoneScale);
-	}
-	else
-	{
-		`AMLOG("Failed to find Legs controller");
-	}
-
-	SkelControl = Pawn.Mesh.FindSkelControl('RibcageScale');
-	if (SkelControl != none)
-	{
-		
-		SkelControl.BoneScale = 1 + default.BoneScale;
-		`AMLOG("Found Ribcage controller, new bone scale:" @ SkelControl.BoneScale);
-	}
-	else
-	{
-		`AMLOG("Failed to find Ribcage controller");
-	}
+	class'Help'.static.ResizeArmor(UnitState, Pawn);
 }
+
+// ======================================================
 
 static function UnitPawnPostInitAnimTree(XComGameState_Unit UnitState, XComUnitPawnNativeBase Pawn, SkeletalMeshComponent SkelComp)
 {
 	local AnimTree AnimTreeTemplate;
 
-	// if (!default.bTogglePatching)
-	// 	return;
-
 	if (XComHumanPawn(Pawn) == none)
 	{
-		if (XComHumanPawn(Pawn) == none) `AMLOG("Pawn is none");
+		if (XComHumanPawn(Pawn) == none) `AMLOG("ERRPR Pawn is none!");
 		else `AMLOG("Have pawn");
 
-		if (UnitState == none) `AMLOG("Unit State is none");
+		if (UnitState == none) `AMLOG("ERROR Unit State is none!");
 		else `AMLOG("Have Unit State:" @ UnitState.GetFullName());
 
 		return;
 	}
 
 	AnimTreeTemplate = Pawn.Mesh.AnimTreeTemplate;
-	if (AnimTreeTemplate.GetPackageName() == 'IRIResizableArmor')
+	if (AnimTreeTemplate.GetPackageName() == 'Soldier_ANIMTREE' && AnimTreeTemplate.Name == 'AT_Soldier')
 	{
-		return;
-	}
-	else `AMLOG("My package name:" @ AnimTreeTemplate.GetPackageName());
+		`AMLOG("Patching Resizable Armor AnimTree for:" @ Pawn.Class.Name);
 
-	`AMLOG("Patching Resizable Armor AnimTree for:" @ Pawn.Class.Name);
-
-	AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_ResizableArmor", class'AnimTree'));
-	//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_Original", class'AnimTree'));
-	//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_XSoldier", class'AnimTree'));
-	if (AnimTreeTemplate == none)
-	{
-		`AMLOG("Failed to acquire AnimTree");
-		return;
+		AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_ResizableArmor", class'AnimTree'));
+		//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_Original", class'AnimTree'));
+		//AnimTreeTemplate = AnimTree(`CONTENT.RequestGameArchetype("IRIResizableArmor.AT_Soldier_XSoldier", class'AnimTree'));
+		if (AnimTreeTemplate == none)
+		{
+			`AMLOG("Failed to acquire AnimTree");
+			return;
+		}
+		SkelComp.SetAnimTreeTemplate(AnimTreeTemplate);
 	}
-	SkelComp.SetAnimTreeTemplate(AnimTreeTemplate);
 }
+
+// ------------------------------------------------------
 
 // AnimTree''
 
